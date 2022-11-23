@@ -1,0 +1,86 @@
+{% extends 'header.html' %}
+
+{% block content %}
+
+    
+
+
+    <style>
+        #map {
+            /* margin-top: 100px; */
+            height: calc(100vh + 10px);
+            background-color: aliceblue;
+        }
+
+        .map-container{
+            height: calc(100vh - 17px);
+            overflow: hidden;
+        }
+    </style>
+
+
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
+
+    <script>
+        var map = L.map('map',{
+            zoomControl:false,
+            attributionControl:false,
+            zoomSnap:0,
+            zoomDelta:0.1,
+
+        }).setView([15.0, 14.0], 2.8);
+
+        // create map panes for layer order
+        map.createPane('base'); map.getPane('base').style.zIndex                = 100;
+        map.createPane('continent'); map.getPane('continent').style.zIndex      = 104;
+        map.createPane('river'); map.getPane('river').style.zIndex              = 116;
+        map.createPane('lake'); map.getPane('lake').style.zIndex                = 118;
+
+        var continentsLayer = new L.GeoJSON.AJAX("/continents/all_continents.geojson", {
+            pane: 'base',
+            onEachFeature: zoom_continent,
+            style: { fillColor: '#ffffff', color: '#3b3b3b', fillOpacity: 1.0, weight: 0.4, opacity: 1, dashArray: '0', }
+        });  
+        
+        
+        var lakesLayer = new L.GeoJSON.AJAX("/continents/lakes.geojson", {
+            pane: 'lake',
+            style: { fillColor: '#28a0d8', color: '#0a94d4', fillOpacity: 0.7, weight: 0.4, opacity: 1, dashArray: '0', }
+        });  
+        
+        
+        var majorriversLayer = new L.GeoJSON.AJAX("assets/africa/major-rivers.geojson", {
+            pane: 'river',
+            style: { fillColor: '#2987b3', color: '#2987b3', fillOpacity: 0.7, weight: 0.8, opacity: 1, dashArray: '0', }
+        });
+        
+        var riversLayer = new L.GeoJSON.AJAX("assets/africa/major-basins/major-basins/107-streams.geojson", {
+            pane: 'river',
+            
+            style: { fillColor: '#2987b3', color: '#2987b3', fillOpacity: 0.7, weight: 0.8, opacity: 1, dashArray: '0', }
+        });
+
+        continentsLayer.addTo(map);
+        majorriversLayer.addTo(map);
+        lakesLayer.addTo(map);
+
+
+        function zoom_continent(feature, layer) {
+            // layer.bindTooltip("<div style='width: 100px; background-color: green;'>" + feature.properties.CONTINENT + "</div>");
+            layer.bindTooltip(feature.properties.CONTINENT);
+            layer.on('mouseover', function(e){
+                layer.openTooltip;
+                console.log(feature.properties.CONTINENT)
+            });
+            layer.on('click', function(e) {
+                console.log(feature.properties.CONTINENT)
+                window.location.href ='/zoom-region/' + feature.properties.CONTINENT;
+            });
+        }
+
+
+
+    </script>
+{% endblock %}

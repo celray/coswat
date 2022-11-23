@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{page_title}} - This time Africa</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+        integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+
+    <script src="/js/leaflet.ajax.min.js"></script>
+    <script src="leaflet.ajax.min.js"></script>
+    <style>
+        #map {
+            /* margin-top: 100px; */
+            height: calc(100vh - 10px);
+            background-color: aliceblue;
+        }
+    </style>
+    <div style="color: #008d00da;"></div>
+</head>
+
+<body style="background-color: #add7e4;">
+    <div id="map"></div>
+
+    <script>
+        var map = L.map('map').setView([15.0, 14.0], 2.8);
+        // // var map = L.map('map').setView([-18.658, 31.776], 9);
+        // var basemap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        //     maxZoom: 19, attribution: 'OSM'
+        // });
+        // basemap.addTo(map);
+
+        // create map panes for layer order
+        map.createPane('base'); map.getPane('base').style.zIndex                = 100;
+        map.createPane('continents'); map.getPane('continents').style.zIndex    = 102;
+        map.createPane('continent'); map.getPane('continent').style.zIndex      = 104;
+        map.createPane('majorbasin'); map.getPane('majorbasin').style.zIndex    = 106;
+        map.createPane('subbasin'); map.getPane('subbasin').style.zIndex        = 108;
+        map.createPane('gaged_lsu'); map.getPane('gaged_lsu').style.zIndex      = 110;
+        map.createPane('lsu'); map.getPane('lsu').style.zIndex                  = 112;
+        map.createPane('hru'); map.getPane('hru').style.zIndex                  = 114;
+        map.createPane('river'); map.getPane('river').style.zIndex              = 116;
+        map.createPane('lake'); map.getPane('lake').style.zIndex                = 118;
+        map.createPane('gaugingstation'); map.getPane('gaugingstation').style.zIndex = 108;
+
+        var continentsLayer = new L.GeoJSON.AJAX("assets/all_continents.geojson", {
+            pane: 'base',
+            style: { fillColor: '#ffffff', color: '#3b3b3b', fillOpacity: 1.0, weight: 0.4, opacity: 1, dashArray: '0', }
+        });  
+        
+        var continentLayer = new L.GeoJSON.AJAX("assets/africa/continent.geojson", {
+            pane: 'continent',
+            style: { fillColor: '#ffffff', color: '#e77212', fillOpacity: 1.0, weight: 0.4, opacity: 1, dashArray: '0', }
+        });  
+        
+        var basinsLayer = new L.GeoJSON.AJAX("assets/africa/major-basins/major-basins.geojson", {
+            pane: 'majorbasin',
+            style: { fillColor: '#afb7b891', color: '#be8e6191', fillOpacity: 0.1, weight: 0.4, opacity: 1, dashArray: '0', }
+        });  
+        
+        var subbasinsLayer = new L.GeoJSON.AJAX("assets/africa/major-basins/major-basins/107.geojson", {
+            pane: 'subbasin',
+            style: { fillColor: '#a80000', color: '#a80000', fillOpacity: 0.1, weight: 0.4, opacity: 1, dashArray: '0', }
+        });  
+        
+        var gagedLsu = new L.GeoJSON.AJAX("assets/africa/major-basins/major-basins/107/22382.geojson", {
+            pane: 'gaged_lsu',
+            style: { fillColor: '#a80000', color: '#a80000', fillOpacity: 0.1, weight: 0.4, opacity: 1, dashArray: '0', }
+        });  
+        
+        var lsusLayer = new L.GeoJSON.AJAX("assets/africa/major-basins/major-basins/107/22382/lsus.geojson", {
+            pane: 'lsu',
+            style: { fillColor: '#a0a0a0', color: '#008d00da', fillOpacity: 0.01, weight: 0.4, opacity: 1, dashArray: '0', }
+        });  
+        
+        var hrusLayer = new L.GeoJSON.AJAX("assets/africa/major-basins/major-basins/107/22382/hrus.geojson", {
+            pane: 'hru',
+            style: { fillColor: '#a0a0a0', color: '#3b3b3b', fillOpacity: 0.2, weight: 0.4, opacity: 0.2, dashArray: '0', }
+        });  
+        
+        
+        var lakesLayer = new L.GeoJSON.AJAX("/shapefiles/lakes.geojson", {
+            pane: 'lake',
+            style: { fillColor: '#28a0d8', color: '#0a94d4', fillOpacity: 0.7, weight: 0.4, opacity: 1, dashArray: '0', }
+        });  
+        
+        
+        var majorriversLayer = new L.GeoJSON.AJAX("assets/africa/major-rivers.geojson", {
+            pane: 'river',
+            style: { fillColor: '#2987b3', color: '#2987b3', fillOpacity: 0.7, weight: 0.8, opacity: 1, dashArray: '0', }
+        });
+        
+        var riversLayer = new L.GeoJSON.AJAX("assets/africa/major-basins/major-basins/107-streams.geojson", {
+            pane: 'river',
+            style: { fillColor: '#2987b3', color: '#2987b3', fillOpacity: 0.7, weight: 0.8, opacity: 1, dashArray: '0', }
+        });
+
+        continentsLayer.addTo(map);
+        continentLayer.addTo(map);
+        majorriversLayer.addTo(map);
+        gagedLsu.addTo(map);
+        lsusLayer.addTo(map);
+        subbasinsLayer.addTo(map);
+        
+        var global_level    = 3;
+        var basins_level    = 5;
+        var subbasins_level = 6;
+        var gaged_level     = 7;
+        var lsus_level      = 8;
+        var hrus_level      = 13;
+
+        function layer_add(layer){
+            if (map.hasLayer(layer)){}
+            else {
+                map.addLayer(layer);
+            }
+        }
+
+        function layer_remove(layer){
+            if (map.hasLayer(layer)) {
+                map.removeLayer(layer);
+            }
+        }
+
+
+        map.on("zoomend", function() {
+            var zoomlevel = map.getZoom();
+
+            if (zoomlevel <= global_level){
+                layer_add(continentsLayer);
+                layer_add(continentLayer);
+                layer_add(majorriversLayer);
+
+                layer_remove(basinsLayer);
+                layer_remove(lakesLayer);
+                // layer_remove(subbasinsLayer);
+                // layer_remove(gagedLsu);
+                layer_remove(lsusLayer);
+                layer_remove(riversLayer);
+                layer_remove(hrusLayer);
+
+            }
+
+            if ((zoomlevel > global_level) & (zoomlevel <= basins_level)){
+                layer_add(continentsLayer);
+                layer_add(continentLayer);
+                layer_add(basinsLayer);
+                layer_add(majorriversLayer);
+                layer_add(lakesLayer);
+                
+                // layer_remove(subbasinsLayer);
+                // layer_remove(gagedLsu);
+                layer_remove(lsusLayer);
+                layer_remove(riversLayer);
+                layer_remove(hrusLayer);
+            }
+
+            
+            if ((zoomlevel > basins_level) & (zoomlevel <= subbasins_level)){
+                layer_add(continentsLayer);
+                layer_add(continentLayer);
+                layer_add(basinsLayer);
+                layer_add(majorriversLayer);
+                // layer_add(subbasinsLayer);
+                layer_add(lakesLayer);
+                
+                // layer_remove(gagedLsu);
+                layer_remove(lsusLayer);
+                layer_remove(riversLayer);
+                layer_remove(hrusLayer);
+            }
+
+            if ((zoomlevel > subbasins_level) & (zoomlevel <= gaged_level)){
+                layer_add(continentLayer);
+                layer_add(continentsLayer);
+                layer_add(basinsLayer);
+                layer_add(majorriversLayer);
+                // layer_add(subbasinsLayer);
+                layer_add(lakesLayer);
+                // layer_add(gagedLsu);
+                
+                layer_remove(lsusLayer);
+                layer_remove(riversLayer);
+                layer_remove(hrusLayer);
+            }
+            
+            if ((zoomlevel > gaged_level) & (zoomlevel <= lsus_level)){
+                layer_add(continentLayer);
+                layer_add(continentsLayer);
+                layer_remove(majorriversLayer);
+                // layer_add(subbasinsLayer);
+                layer_add(lakesLayer);
+                // layer_add(gagedLsu);
+                layer_add(lsusLayer);
+                
+                layer_remove(basinsLayer);
+                layer_add(riversLayer);
+                layer_remove(hrusLayer);
+            }
+
+            if ((zoomlevel > lsus_level) & (zoomlevel <= hrus_level)){
+                layer_add(continentLayer);
+                layer_add(continentsLayer);
+                layer_remove(majorriversLayer);
+                // layer_add(subbasinsLayer);
+                layer_add(lakesLayer);
+                layer_add(hrusLayer);
+                layer_add(riversLayer);
+                layer_add(lsusLayer);
+                // layer_add(gagedLsu);
+                
+                layer_remove(basinsLayer);
+            }
+            
+            console.log("Current Zoom Level = " + zoomlevel);
+        });
+    </script>
+</body>
+
+</html>
