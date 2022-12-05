@@ -10,6 +10,15 @@ from django.conf import settings
 from django.contrib.auth.hashers import make_password
 
 import os
+from glob import glob
+
+
+
+
+
+
+
+
 
 
 
@@ -25,16 +34,13 @@ def home(request):
 
 
 
-
-
-def view_continent(request, continent):
+def home_map(request):
 
     args = {
-        "page_title"            : f"CoSWAT Plus - {continent}",
-        "continent"             : continent,
+        "page_title"            : f"CoSWAT Plus - The Community SWAT+ Model",
     }
 
-    response = render(request=request, template_name='continent.html', context=args)
+    response = render(request=request, template_name='home-map.html', context=args)
     return response
 
 
@@ -80,7 +86,6 @@ def get_js(request, file_name=''):
     file_name = os.path.basename(file_name)
     download_path = os.path.join(settings.BASE_DIR, "assets/js", file_name)
     
-    print(download_path)
     if os.path.exists(download_path):
         with open(download_path, 'rb') as fh:
             response = HttpResponse(
@@ -173,10 +178,12 @@ def get_major_subbasins_file(request, continent):
     raise Http404
 
 
+def get_subbasin_file(request, continent, basin_file):
 
-def get_subbasin_streams(request, continent, basin_id):
-    
-    download_path = os.path.join(settings.BASE_DIR, f"assets/model-data/{continent}/major-basins/major-basins/{basin_id}-streams.geojson")
+    download_path = os.path.join(settings.BASE_DIR, f"assets/model-data/{continent}/major-basins/major-basins/{basin_file}")
+    print('--')
+    print(download_path)
+    print('--')
     if os.path.exists(download_path):
         with open(download_path, 'rb') as fh:
             response = HttpResponse(
@@ -186,4 +193,91 @@ def get_subbasin_streams(request, continent, basin_id):
             return response
     raise Http404
 
+
+def get_gaged_lsu(request, continent, major_id, lsu_id):
+    print('----ind------')
+    download_path = os.path.join(settings.BASE_DIR, f"assets/model-data/{continent}/major-basins/major-basins/{major_id}/{lsu_id}.geojson")
+    print(download_path)
+    
+    if os.path.exists(download_path):
+        with open(download_path, 'rb') as fh:
+            response = HttpResponse(
+                fh.read(), content_type="application/octet-stream")
+            response['Content-Disposition'] = 'inline; filename=' + \
+                os.path.basename(download_path)
+            return response
+    raise Http404
+
+
+
+
+
+
+
+
+
+
+
+# framed responses
+
+def load_gaged_shapes(request, continent, major_id):
+
+    gaged_lsus_dir = os.path.join(settings.BASE_DIR, f"assets/model-data/{continent}/major-basins/major-basins/{major_id}/")
+    
+    file_names = list_files(gaged_lsus_dir, 'geojson')
+    lsu_ids = [file_name(fn) for fn in file_names]
+    
+    args = {
+        "lsu_ids"    : lsu_ids,
+        "continent"  : continent,
+        "major_id"   : major_id,
+    }
+
+    response = render(request=request, template_name='gaged_shapes_loader.html', context=args)
+    return response
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# generic functions
+
+def list_files(folder, extension="*"):
+    if folder.endswith("/"):
+        if extension == "*":
+            list_of_files = glob(folder + "*")
+        else:
+            list_of_files = glob(folder + "*." + extension)
+    else:
+        if extension == "*":
+            list_of_files = glob(folder + "/*")
+        else:
+            list_of_files = glob(folder + "/*." + extension)
+    return list_of_files
+
+
+def file_name(path_, extension=False):
+    if extension:
+        fn = os.path.basename(path_)
+    else:
+        fn = os.path.basename(path_).split(".")[0]
+    return(fn)
 

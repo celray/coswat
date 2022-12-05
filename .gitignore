@@ -1,5 +1,11 @@
 home/templates/old
 *.pyc
 assets/model-data/*
+assets/model-data_dev-backup/*
+assets/model-setups/*
 home/templates/keep/*
 mapdev/*
+assets/scripts/CoSWATLogic
+assets/other/~$design.pptx
+home/templates/container_div_bg.png
+assets/scripts/move_to_cjfx.txt
