@@ -1,0 +1,20 @@
+<div class="profile-bounds">
+    <div class="profile-image contain-image" onclick="{% if user.is_authenticated %} show_profile_dropdown() {% else %} request_login() {% endif %}" style="background-image: url('/images/profile_img.png'); cursor: pointer;"></div>
+</div>
+
+<div id="profile-menu" class="shadow-lg blue-accent-login default-0h">
+    <ul class="profile-links" style="text-align: left; padding: 10px; list-style: none;">
+        {{request.user.first_name}} {{request.user.last_name}}
+        <hr style="margin-top: 0px; margin-bottom: 0px">
+        
+
+        {% if request.user.is_superuser %}
+            <li class="profile-link" onclick="show_profile_dropdown()"><a href="/manage" target="_blank">Manage Site</a></li>
+        {% endif %}
+
+        <li class="profile-link" onclick="show_profile_dropdown()"><a href="#">My Requests</a></li>
+        <li class="profile-link" onclick="show_profile_dropdown()"><a href="#">Profile Details</a></li>
+        <li class="profile-link" onclick="show_profile_dropdown()"><a href="#">Settings</a> </li>
+        <li class="profile-link" onclick="show_profile_dropdown(); logout_user()"><a href="#">Log Out</a></li>
+    </ul>
+</div>

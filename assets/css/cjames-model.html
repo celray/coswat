@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C James Modal</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+
+
+    <style>
+        .page-contents {
+            margin: auto;
+            width: 100%;
+            max-width: 1500px;
+            padding-top: 50px;
+        }
+
+        .my-awesome-modal {
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+
+            position: absolute;
+            overflow: hidden;
+            height: 80vh;
+            width: 80vw;
+            background-color: #d6d4d4;
+            left: calc(50vw - 40vw);
+            top: calc(50vh - 40vh);
+
+            animation: wide-expand 1.5s ease;
+            }
+
+            @keyframes wide-expand {
+                0% {
+                    height: 3px;
+                    background-color: darkblue;
+                    width: 0vw;
+                    left: calc(50vw - 0vw);
+                    top: calc(50vh - 0vh);
+                }
+
+                50% {
+                    height: 1px;
+                    width: 80vw;
+                    left: calc(50vw - 40vw);
+                    top: calc(50vh - 0vh);
+                }
+
+                100% {
+                    height: 80vh;
+                    width: 80vw;
+                    left: calc(50vw - 40vw);
+                    top: calc(50vh - 40vh);
+                }
+            }
+
+        .my-awesome-modal-closed {
+            position: absolute;
+            overflow: hidden;
+            height: 0vh;
+            width: 0vw;
+            background-color: #d6d4d4;
+            left: calc(0vw);
+            top: calc(0vh);
+
+            animation: wide-close 0.5s ease;
+            }
+
+            @keyframes wide-close {
+                0% {
+                    height: 80vh;
+                    width: 80vw;
+                    left: calc(50vw - 40vw);
+                    top: calc(50vh - 40vh);
+                }
+
+                60% {
+                    height: 0px;
+                    width: 80vw;
+                    top: calc(50vh - 0vh);
+                    left: calc(50vw - 40vw);
+                    opacity: 1;
+                }
+
+                100% {
+                    height: 10vh;
+                    width: 80vw;
+                    top: calc(50vh - 5vh);
+                    left: calc(50vw - 40vw);
+                    opacity: 0;
+                }
+
+            }
+
+        .modal-content {
+
+            opacity: 1;
+            margin-top: 20px;
+            margin-left: 20px;
+            width: calc(100% - 40px);
+
+            animation: reveal-by-opacity 4s ease;
+        }
+
+        
+
+        @keyframes reveal-by-opacity {
+            0% {
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .acrylic {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(5px); /* Safari */
+
+            background-blend-mode: exclusion;
+            background: rgba(255, 255, 255, .6);
+        }
+    </style>
+
+
+
+    <script>
+        function close_cj_modal(modal_id){
+            var modal_obj = document.getElementById(modal_id);
+
+            modal_obj.classList.remove('my-awesome-modal');
+            modal_obj.classList.add('my-awesome-modal-closed');
+            modal_obj.style.visibility = 'collapsed';
+        }
+        
+        function bring_modal(modal_id){
+            var modal_obj = document.getElementById(modal_id);
+
+            modal_obj.style.visibility = 'visible';
+
+            modal_obj.classList.remove('my-awesome-modal-closed');
+            modal_obj.classList.add('my-awesome-modal');
+        }
+    </script>
+
+
+</head>
+
+<body>
+    <div class="page-contents">
+        <p>
+
+            Chances are that you've seen "lorem ipsum" text in your travels across the web. It often appears in graphic
+            design materials such as WordPress themes and publishing mockups.
+        </p>
+
+        <p>
+
+            This text looks like nonsense, so why is it so common? Let's take a look at what lorem ipsum copy is used
+            for,
+            what lorem ipsum means in English, and how you can easily generate this text yourself.
+            What Is Lorem Ipsum?
+        </p>
+
+        <p>
+
+            Lorem ipsum is a name for a common type of placeholder text. Also known as filler or dummy text, this is
+            text
+            copy that serves to fill a space without saying anything meaningful. It's essentially nonsense text that
+            still
+            gives an idea of what real words will look like in the final product.
+        </p>
+
+        <p>
+
+            In case you're not familiar with it, the most common form of lorem ipsum text is the following:
+        </p>
+
+        <p>
+
+
+            <a href="#" onclick="bring_modal('modal-1')">Where</a> Did Lorem Ipsum Come From?
+        </p>
+
+        <p>
+
+
+            While lorem ipsum text looks like gibberish, it's actually rooted in a real Latin text. It comes from
+            Cicero's
+            45 BC work "De finibus bonorum et malorum" ("On the ends of good and evil" in English), which is a look at
+            ethics. The lorem ipsum text comes from sections 1.10.32 and 1.10.33.
+        </p>
+
+        <p>
+
+
+            However, the common lorem ipsum text we use today is not proper Latin. Compared to Cicero's work, our lorem
+            ipsum text is meaningless. It's had words added, removed, and changed that result in a mutation far from its
+            initial form.
+        </p>
+
+        <p>
+
+
+            Dr. Richard McClintock discovered the source of the text when searching for the rare Latin word
+            "consectetur" in
+            classical literature. His search turned up Cicero's work.
+
+        </p>
+
+        <p>
+
+            However, it's unknown who made these modifications to the text, or exactly when they did this, to turn it
+            into
+            the mess of words we know today. Sometime in the 1500s, an unknown printer scrambled words that have
+            survived
+            into the digital age.
+        </p>
+
+        <p>
+
+
+            As far as its modern usage, the earliest known use of lorem ipsum text as a placeholder was in the 1960s,
+            when a
+            company called Letraset used this text on its typeface sheets. Later, in the 1980s, the now-defunct company
+            Adlus also used lorem ipsum placeholder text in its PageMaker desktop publishing software.
+        </p>
+    </div>
+
+    <style>
+        .closer{
+            width: 70px;
+            height: 27px;
+            border-radius: 0px 0px 0px 0px ;
+        }
+
+        .title-bar{
+            margin-right: 10px;
+        }
+    </style>
+
+
+    <div id="modal-1" class=" shadow-lg acrylic hide" style="border-radius: 10px; visibility: collapse;">
+        <div class="title-bar" style="display: flex;">
+            <div class="flexer" style="width: calc(100% - 10px);"></div>
+            <div class="closer cover-image" style="margin-right: 4px; background-image: url(close-button-red.png); cursor: pointer;" onclick="close_cj_modal('modal-1')" ></div>
+        </div>
+        <div class="modal-content">
+
+            <!-- We mentioned this site above as a general resource for lorem ipsum text. As you'd imagine, no site dedicated
+            to this would be complete without its own lorem ipsum generator.
+
+            Notably, this site explains that it doesn't inject anything into its generated lorem ipsum text. It claims
+            that other sites add humorous elements, start to repeat after some time, or use nonsensical text. This site
+            instead uses proper Latin words.
+
+            Simply choose a number of paragraphs, words, bytes, or lists and click Generate Lorem Ipsum to get a chunk
+            of text you can copy. If you like, you can even uncheck a box and the text won't start with "Lorem ipsum
+            dolor sit amet." -->
+        </div>
+    </div>
+
+
+</body>
+
+</html>

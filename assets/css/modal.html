@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        .modal {
+            background: dodgerblue;
+            height: 1px;
+            overflow: hidden;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s ease 0.5s,
+                height 0.5s ease;
+            width: 0;
+        }
+
+        .content {
+            color: transparent;
+            font-family: 'Consolas', arial, sans-serif;
+            font-size: 2em;
+            position: absolute;
+            top: 50%;
+            text-align: center;
+            transform: translate3d(0, -50%, 0);
+            transition: color 0.5s ease;
+            width: 100%;
+        }
+
+        label {
+            color: rgb(163, 163, 163);
+            cursor: pointer;
+            font-family: 'Consolas', arial, sans-serif;
+            font-size: 2em;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            text-transform: uppercase;
+            transform: translate(-50%, -50%);
+            transition: color 0.5s ease 0.5s;
+        }
+
+        input {
+            cursor: pointer;
+            height: 0;
+            opacity: 0;
+            width: 0;
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        input:checked {
+            height: 40px;
+            opacity: 1;
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            z-index: 1;
+            -webkit-appearance: none;
+            width: 40px;
+
+            &::after,
+            &:before {
+                border-top: 1px solid #FFF;
+                content: '';
+                display: block;
+                position: absolute;
+                top: 50%;
+                transform: rotate(45deg);
+                width: 100%;
+            }
+
+            &::after {
+                transform: rotate(-45deg);
+            }
+        }
+
+        input:checked+label {
+            color: rgb(187, 0, 125);
+            transition: color 0.5s ease,
+        }
+
+        input:checked~.modal {
+            height: 100%;
+            width: 100%;
+            transition: width 0.5s ease,
+                height 0.5s ease 0.5s;
+
+            .content {
+                color: #FFF;
+                transition: color 0.5s ease 0.5s;
+            }
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <label for="button"> Click Me!</label>
+    <input id="button" type="checkbox" />
+    <div class="modal" style="max-width: 80%; margin:auto; max-height:80%;">
+        <div class="content">
+            <div style="color: green;">Pure CSS Modal! No JS!</div>
+        </div>
+    </div>
+
+</body>
+
+</html>

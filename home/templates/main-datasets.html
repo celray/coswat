@@ -1,0 +1,55 @@
+{% extends 'main-header.html' %}
+
+{% block content %}
+
+<div class="main-content-container container">
+
+    <div class="content-leader">
+        The Community SWAT+ Model v0.2.2 uses the following openly available datasets.
+    </div>
+
+    <div class="inner-nav flex-contents">
+        <a href="#" class="inner-active-link">Input Data</a>
+        <a href="#" class="inner-nav-link">Calibration Data</a>
+    </div>
+    <hr style="max-width: 350px; color: #0b2e46; margin-top: 2px;">
+
+    <div class="row col-boxes">
+
+        {% for dataset_source in datasets_sources %}
+            
+            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3" style="height: 260px;">
+                <a style="text-decoration: none;cursor: pointer;" onclick="open_cj_modal('modal-{{forloop.counter}}')">
+                    <div class="cover-image rounded"
+                        style="background-image: url(/images/{{dataset_source.image}}); width: 100%; height: calc(100% - 60px); padding: 2px;">
+                        <div class="col-title"> {{dataset_source.name}} </div>
+                    </div>
+                </a>
+            </div>
+
+
+            <div id="modal-{{forloop.counter}}" class="shadow-lg acrylic" style="visibility: collapse; border-radius: 10px;">
+                <div class="title-bar" style="display: flex;">
+                    <div class="flexer" style="width: calc(100% - 10px);"></div>
+                    <div class="closer cover-image" style="margin-right: 4px; background-image: url('/images/close-button-red.png'); cursor: pointer;" onclick="close_cj_modal('modal-{{forloop.counter}}')" ></div>
+                </div>
+                <div id="modal_content" class="modal-content">
+                    <div>
+                        <h5>{{dataset_source.name}}</h5>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-5 col-lg-3">
+                            <img src="/images/{{dataset_source.image}}" style="width: 100%; height:auto; border-radius: 10px;" alt="">
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-7 col-lg-9">{{dataset_source.description|safe}}</div>
+                    </div>
+                </div>
+            </div>
+
+        {% endfor %}
+
+    </div>
+</div>
+
+{% endblock %}

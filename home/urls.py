@@ -20,11 +20,18 @@ urlpatterns = [
     re_path(r'continents/(?P<file_name>[A-Za-z0-9&\&\%\s\-._\']+)', views.get_continents, name = 'get_continents'),
 
     # page paths
-    # path('', views.home, name='home'),
     path('', views.home_map, name='home_map'),
-    # re_path(r'zoom-region/(?P<continent>[A-Za-z0-9&\&\%\s\-._\']+)', views.home_map, name = 'home_map'),
+    path('datasets', views.datasets, name='datasets'),
+    path('scripts', views.scripts, name='scripts'),
+    path('outputs', views.outputs, name='outputs'),
+    path('calibration', views.calibration, name='calibration'),
+    path('about', views.about, name='about'),
 
-    
+    path('signin', views.signin, name='signin'),
+    path('signout', views.signout, name='signout'),
+    path('login-frame', views.signin_frame, name='signin_frame'),
+    path('avatar-frame', views.avatar_frame, name='avatar_frame'),
+    path('null', views.null_page, name='null_page'),
 
 
 

@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoSWAT-GM - The Global Community SWAT+ Model</title>
+    <title>{{page_title}}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="/css/style.css">
 
@@ -19,6 +20,7 @@
         integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
 
     <script src="/js/leaflet.ajax.min.js"></script>
+    <script src="/js/cj-javascript.js"></script>
     <!-- <script src="leaflet.ajax.min.js"></script> -->
 
 
@@ -26,24 +28,142 @@
 <body>
     <div class="nav blue-accent-bg">
         <div class="container inner_nav flex-contents">
-            <div class="logo contain-image" style="background-image: url('/images/logo.png');"></div>
+            <a class="logo contain-image" style="background-image: url('/images/logo.png');" href="/">
+
+            </a>
+            <!-- <div ></div> -->
             <div class="nav-items-container flex-contents">
 
                 <div class="nav-fill"></div>
+
                 <div class="nav-links flex-contents">
-                    <a href="#" class="active-link">Home</a>
-                    <a href="#" class="cj-nav-link">Datasets</a>
-                    <a href="#" class="cj-nav-link">Scripts</a>
-                    <a href="#" class="cj-nav-link">Outputs</a>
-                    <a href="#" class="cj-nav-link">Calibration</a>
-                    <a href="#" class="cj-nav-link">About</a>
+                    <a href="/"             class="{% if index == 1 %} active-link {% else %} cj-nav-link {% endif %}">Home</a>
+                    <a href="/datasets"     class="{% if index == 2 %} active-link {% else %} cj-nav-link {% endif %}">Datasets</a>
+                    <a href="/scripts"      class="{% if index == 3 %} active-link {% else %} cj-nav-link {% endif %}">Scripts</a>
+                    <a href="/outputs"      class="{% if index == 4 %} active-link {% else %} cj-nav-link {% endif %}">Outputs</a>
+                    <a href="/calibration"  class="{% if index == 5 %} active-link {% else %} cj-nav-link {% endif %}">Calibration</a>
+                    <a href="/about"        class="{% if index == 6 %} active-link {% else %} cj-nav-link {% endif %}">About</a>
                 </div>
-                <div class="profile-avatar" >
-                    <div class="profile-bounds">
-                        <div class="profile-image contain-image" style="background-image: url('/images/profile_img.png');">
-    
-                        </div>
+
+                <div id="profile_avatar" class="profile-avatar" >
+                    
+                </div>
+
+
+                <div id="modal-login" class="shadow-lg acrylic" style="visibility: collapse; border-radius: 10px;">
+                    <div class="title-bar" style="display: flex;">
+                        <div class="flexer" style="width: calc(100% - 10px);"></div>
+                        <div class="closer cover-image" style="margin-right: 4px; background-image: url('/images/close-button-red.png'); cursor: pointer;" onclick="request_login()" ></div>
                     </div>
+                    <form id="login_form_content" action="/login-frame" method="POST" class = "needs-validation" style="width: 100%; margin-top: 10px; overflow: visible;">
+
+                    </form>
+                </div>
+
+                    <script>
+                        
+                        document.addEventListener("DOMContentLoaded", function(){
+                            load_login_form();
+                            load_avatar_frame();
+                        });
+
+                        async function load_login_form(){
+                            const contentDiv = document.getElementById("login_form_content");
+                            contentDiv.innerHTML = await fetchHtmlAsText("/login-frame");
+                        };
+
+                        async function load_avatar_frame(){
+                            const contentDiv = document.getElementById("profile_avatar");
+                            contentDiv.innerHTML = await fetchHtmlAsText("/avatar-frame");
+                        };
+
+                        async function fetchHtmlAsText(url) {
+                            const response = await fetch(url);
+                            return await response.text();
+                        }
+
+                        var form = document.getElementById("login_form_content");
+
+                        function logout_user(){
+                            $.ajax({
+                                url : "/signout", // the endpoint
+                                type : "GET", // http method
+                                
+                                // handle a successful response
+                                success : function(json) {
+                                    console.log(json); // log the returned json to the console
+                                    console.log("success"); // another sanity check
+                                    load_avatar_frame();
+                                    load_login_form();
+                                },
+
+                                // handle a non-successful response
+                                error : function(xhr,errmsg,err) {
+                                    load_login_form();
+                                }
+                            });
+                        }
+
+                        form.addEventListener('submit', function(event){
+                            event.preventDefault();
+                            console.log("form submitted!")  // sanity check
+                            
+                            $.ajax({
+                                url : "/login-frame", // the endpoint
+                                type : "POST", // http method
+                                data : {
+                                    username    : $('#username').val(),
+                                    current_url : jQuery('[name=current_url]').val(),
+                                    password    : $('#password').val(),
+                                    'csrfmiddlewaretoken' : jQuery("[name=csrfmiddlewaretoken]").val(),
+                                }, // data sent with the post request
+
+                                // handle a successful response
+                                success : function(json) {
+                                    $('#current_url').val(''); // remove the value from the input
+                                    console.log(json); // log the returned json to the console
+                                    console.log("success"); // another sanity check
+                                    request_login();
+                                    load_avatar_frame();
+                                },
+
+                                // handle a non-successful response
+                                error : function(xhr,errmsg,err) {
+                                    $('#login_form_content').html("<div style='margin-top: 20px; text-align: center;'>There was an error! <br> <br> <a style='color: #15558d; cursor: pointer; text-decoration: none;' onclick='load_login_form()'>Retry?</a> </div>"); // add the error to the dom
+                                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                                }
+                            });
+                            
+                        });
+
+                        
+                        function request_login(){
+                            var current_url_form = document.getElementById('current_url_form');
+                            
+                            var modal_obj = document.getElementById('modal-login');
+                            var modal_obj_content = document.getElementById('login_form_content');
+
+                            if (!modal_obj.classList.contains('celray-login-modal-open')){
+                                modal_obj.style.visibility = 'visible';
+                                modal_obj.classList.remove('celray-login-modal-closed');
+                                modal_obj.classList.add('celray-login-modal-open');
+                                
+                                modal_obj_content.classList.remove('login-form-content-out');
+                                modal_obj_content.classList.add('login-form-content-in');
+                            } else if (modal_obj.classList.contains('celray-login-modal-open'))
+                            {
+                                modal_obj.classList.remove('celray-login-modal-open');
+                                modal_obj.classList.add('celray-login-modal-closed');
+                                modal_obj.style.visibility = 'collapsed';
+
+                                modal_obj_content.classList.remove('ogin-form-content-in');
+                                modal_obj_content.classList.add('login-form-content-out');
+                            }
+                            console.log('click')
+                        }
+
+                    </script>
+                    
                 </div>
 
             </div>
@@ -58,34 +178,36 @@
             {% endblock %}
         </div>
     </div>
-
-    <div id="info-pannel" class="info-pannel flex-contents shadow">
-        <div class="text-pannel">
-            <div class="row-div flex-contents">
-                <div class="detail-left">Continent</div>
-                <div id="continent-id" class="detail-right">: </div>
-            </div>
-            
-            <div class="row-div flex-contents">
-                <div class="detail-left">Basin/Region</div>
-                <div id="basin-id" class="detail-right">: </div>
-            </div>
     
-            <div class="row-div flex-contents" style="visibility: hidden;">
-                <div class="detail-left">Region ID</div>
-                <div id="subbasin-id" class="detail-right">:</div>
+    {% if details_pannel %}
+        <div id="info-pannel" class="info-pannel flex-contents shadow">
+            <div class="text-pannel">
+                <div class="row-div flex-contents">
+                    <div class="detail-left">Continent</div>
+                    <div id="continent-id" class="detail-right">: </div>
+                </div>
+                
+                <div class="row-div flex-contents">
+                    <div class="detail-left">Basin/Region</div>
+                    <div id="basin-id" class="detail-right">: </div>
+                </div>
+        
+                <div class="row-div flex-contents" style="visibility: hidden;">
+                    <div class="detail-left">Region ID</div>
+                    <div id="subbasin-id" class="detail-right">:</div>
+                </div>
             </div>
+
+            <div class="action-pannel">
+
+            </div>
+
         </div>
-
-        <div class="action-pannel">
-
-        </div>
-
-    </div>
-
+    {% endif %}
 
     <div class="footer orange-accent-bg">
         <a href="https://celray.chawanda.com">© Web Design: Celray James CHAWANDA</a>
     </div>
+
 </body>
 </html>

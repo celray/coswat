@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
-# from . import models, forms
+from . import models
 from django.utils.timezone import make_aware
 
 from django.conf import settings
@@ -11,6 +11,8 @@ from django.contrib.auth.hashers import make_password
 
 import os
 from glob import glob
+from django.middleware.csrf import get_token
+
 
 
 
@@ -27,6 +29,7 @@ def home(request):
 
     args = {
         "page_title"            : "CoSWAT Plus - The Community SWAT+ Model",
+        'csrf_token' : get_token(request)
     }
 
     response = render(request=request, template_name='home.html', context=args)
@@ -38,9 +41,88 @@ def home_map(request):
 
     args = {
         "page_title"            : f"CoSWAT Plus - The Community SWAT+ Model",
+        "index"                 : 1,
+        "details_pannel"        : True
     }
 
     response = render(request=request, template_name='home-map.html', context=args)
+    return response
+
+
+
+
+
+def datasets(request):
+
+    datasets_sources  = models.model_data.objects.all()
+
+
+
+
+
+    args = {
+        "page_title"            : f"Datasets - CoSWAT Plus",
+        "index"                 : 2,
+        "datasets_sources"      : datasets_sources,
+    }
+
+    response = render(request=request, template_name='main-datasets.html', context=args)
+    return response
+
+
+def scripts(request):
+
+    args = {
+        "page_title"            : f"Scripts - CoSWAT Plus",
+        "index"                 : 3
+    }
+
+    response = render(request=request, template_name='main-scripts.html', context=args)
+    return response
+
+
+def outputs(request):
+
+    args = {
+        "page_title"            : f"Outputs - CoSWAT Plus",
+        "index"                 : 4
+    }
+
+    response = render(request=request, template_name='main-outputs.html', context=args)
+    return response
+
+
+
+
+def calibration(request):
+
+    args = {
+        "page_title"            : f"Calibration - CoSWAT Plus",
+        "index"                 : 5
+    }
+
+    response = render(request=request, template_name='main-calibration.html', context=args)
+    return response
+
+
+
+
+def about(request):
+
+    args = {
+        "page_title"            : f"About - CoSWAT Plus",
+        "index"                 : 6
+    }
+
+    response = render(request=request, template_name='main-about.html', context=args)
+
+    
+    response["Access-Control-Allow-Origin"] = "*"
+    response["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+    response["Access-Control-Max-Age"] = "1000"
+    response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+
+
     return response
 
 
@@ -57,6 +139,28 @@ def home_map(request):
 
 
 
+# user management
+
+
+def signin(request):
+
+    if request.user.is_authenticated:
+        return redirect("/")
+
+    current_url = None
+    if request.method == "POST":
+        current_url      = f"{request.POST['current_url']}"
+
+        print(current_url)
+    args = {
+            }
+    return render(request, "main-signin.html", args)
+
+
+def signout(request):
+    logout(request)
+    return redirect("/")
+        
 
 
 
@@ -66,6 +170,23 @@ def home_map(request):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# assets 
 
 def get_css(request, file_name=''):
     
@@ -239,11 +360,47 @@ def load_gaged_shapes(request, continent, major_id):
 
 
 
+def signin_frame(request):
+
+    if request.user.is_authenticated:
+        return redirect("/")
+
+    current_url = None
+    if request.method == "POST":
+        current_url     = f"{request.POST['current_url']}"
+        username        = f"{request.POST['username']}"
+        password        = f"{request.POST['password']}"
+
+        print(current_url)
+        print(username)
+        print(password)
+
+        user = authenticate(request, username=username, password=password)
+
+        if user:
+            login(request, user)
+            response = redirect('null_page')
+
+        else:
+            response = redirect('null_page')
+            response.status_code = 500
+
+        return response
+    args = {
+            }
+
+    response = render(request, "frame-login.html", args)
+
+    return response
 
 
 
 
+def avatar_frame(request):
+    args = { }
 
+    response = render(request, "frame-avatar.html", args)
+    return response
 
 
 
@@ -280,4 +437,10 @@ def file_name(path_, extension=False):
     else:
         fn = os.path.basename(path_).split(".")[0]
     return(fn)
+
+
+def null_page(request):
+    response = render(request=request, template_name='null-page.html', context={})
+    return response
+
 

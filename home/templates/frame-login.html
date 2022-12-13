@@ -1,0 +1,29 @@
+{% csrf_token %}
+
+<input style="display: none;" type="text" value="{{request.path}}" id="current_url" name="current_url" id
+    class="form-control" placeholder="" aria-label="">
+
+<div class="input-group flex-nowrap"
+    style="padding-left: 13px; padding-right: 13px; margin-bottom: 10px; margin-top: 10px; width: 100%;">
+    <!-- <span class="input-group-text" id="addon-wrapping" style="width: 120px;">Username</span> -->
+    <input name="username" id="username" type="text" class="form-control" placeholder="Username or email" aria-label="Username"
+        aria-describedby="addon-wrapping">
+</div>
+
+
+<div class="input-group flex-nowrap"
+    style="padding-left: 13px; padding-right: 13px; margin-bottom: 10px; margin-top: 20px; width: 100%;">
+    <!-- <span class="input-group-text" id="addon-wrapping" style="width: 120px;">Password</span> -->
+    <input name="password" id="password" type="password" class="form-control" placeholder="Password" aria-label="Password"
+        aria-describedby="addon-wrapping">
+</div>
+
+<div class="flex-contents"
+    style="text-align: center; color: white; padding-left: 13px; padding-right: 13px; padding-top: 13px;">
+    <div style="width: calc(100% - 165px);"></div>
+    <button
+        style="color:white; width: 80px; height:32px; padding-bottom: 3px; border-radius: 4px; border-color: #15558d; background-color: #15558d; margin-right: 5px; cursor: pointer;"
+        onclick="signup_page()">Signup</button>
+    <button type="submit"
+        style="color:white; width: 80px; height:32px; padding-bottom: 3px; border-color: #15558d; border-radius: 4px; background-color: #15558d; cursor: pointer;">Login</button>
+</div>
