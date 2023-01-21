@@ -1,3 +1,5 @@
+#!/bin/python3
+
 '''
 
 
@@ -11,7 +13,6 @@ ignore_warnings()
 # change working directory
 me = os.path.realpath(__file__)
 os.chdir(os.path.dirname(me))
-
 
 args = sys.argv[1:]
 
@@ -27,11 +28,13 @@ else:
     models_dir  = f"../../../../tools/CoSWAT-Global-Model/model-setup/CoSWATv{version}"
     zones       = args[2:] 
 
-dissolve = True if args[1] == 'yes' else False
+dissolve = True if ((args[1] == 'yes') or (args[1] == 'y')) else False
 
 
 
 all_zones = {}
+final_json = None
+
 for model_setup in zones:
     parts       = model_setup.split('-')
 
@@ -41,7 +44,13 @@ for model_setup in zones:
     print(f"\n\t> processing {basin}")
 
     create_path(f"../model-setups/{continent}/")
-    create_path(f"../model-setups/{continent}/{basin}/")
+    
+    dst_figures_dir = create_path(f"../model-setups/{continent}/{basin}/figures/")
+    src_figures_dir = f"{models_dir}/{model_setup}/Evaluation/Figures/"
+
+    figures_list = list_files(src_figures_dir)
+    for fig_ in figures_list:
+        copy_file(fig_, f"{dst_figures_dir}/{file_name(fig_)}", v=False)
 
     lsus2 = geopandas.read_file(f"{models_dir}/{model_setup}/Watershed/Shapes/lsus2.shp")
     rivs1 = geopandas.read_file(f"{models_dir}/{model_setup}/Watershed/Shapes/rivs1.shp")
@@ -64,6 +73,17 @@ for model_setup in zones:
 
     all_zones[f'{continent}'].append(lsus2)
 
+    point_json_fn   = f'{models_dir}/{model_setup}/Evaluation/Shape/indices.geojson'
+    
+    if exists(point_json_fn):
+        point_geojson_gpd   = geopandas.read_file(point_json_fn).to_crs('EPSG:4326')
+        
+        if final_json is None:
+            final_json = point_geojson_gpd
+        else:
+            final_json = geopandas.GeoDataFrame(pandas.concat([final_json, point_geojson_gpd]), geometry='geometry', crs = point_geojson_gpd.crs)
+
+
     if not dissolve:
         continue
 
@@ -71,19 +91,44 @@ for model_setup in zones:
     # set variables
     shapes_dir = f"{models_dir}/{model_setup}/Watershed/Shapes"
 
-    point_fn = f'{models_dir}/{model_setup}/Evaluation/Shape/indices.gpkg'
-    lsus_fn = f'{shapes_dir}/lsus2.shp'
-    rivers_fn = f'{shapes_dir}/rivs1.shp'
+    point_fn        = f'{models_dir}/{model_setup}/Evaluation/Shape/indices.gpkg'
+    lsus_fn         = f'{shapes_dir}/lsus2.shp'
+    rivers_fn       = f'{shapes_dir}/rivs1.shp'
 
     lsus_dir = gaged_shapes_dir
 
     if not exists(point_fn): continue
     # read shapes
-    point_gpd = geopandas.read_file(point_fn).to_crs('EPSG:4326')
-    lsus_gpd = geopandas.read_file(lsus_fn).to_crs('EPSG:4326')
-    rivers_gpd = geopandas.read_file(rivers_fn).to_crs('EPSG:4326')
+    point_gpd           = geopandas.read_file(point_fn).to_crs('EPSG:4326')
+    lsus_gpd            = geopandas.read_file(lsus_fn).to_crs('EPSG:4326')
+    rivers_gpd          = geopandas.read_file(rivers_fn).to_crs('EPSG:4326')
 
+    # create tree dictionary
+    
+    channel_tree = {}
+    for index_riv, row_riv in rivers_gpd.iterrows():
+        if row_riv['ChannelR'] == 0: continue
+        if not row_riv['ChannelR'] in channel_tree:
+            channel_tree[row_riv['ChannelR']] = []
+
+        if not row_riv['Channel'] in channel_tree[row_riv['ChannelR']]:
+            channel_tree[row_riv['ChannelR']].append(row_riv['Channel'])
+
+
+    def recurse_chanels(e_chan_, channels___):
+        if not e_chan_ in channel_tree:
+            return
+        for channumber in channel_tree[e_chan_]:
+            # if not channumber
+            channels___.append(channumber)
+            recurse_chanels(channumber, channels___)
+            
+        
+        return
+
+    
     new_network = rivers_gpd[0:0]
+
 
     current_min = {}
     selected_rivers = {}
@@ -102,7 +147,18 @@ for model_setup in zones:
             elif distance < current_min[row.channel]:
                 current_min[row.channel] = distance
                 selected_rivers[row.channel] = row_riv['Channel']
-    print()
+    # print()
+
+    # for selected_river in selected_rivers:
+    #     print(selected_river)
+
+    # quit()
+
+    safe_names_kept = []
+    for selected_river in selected_rivers:
+        safe_names_kept.append(selected_rivers[selected_river])
+
+    upstream_rivers = {}
     for selected_river in selected_rivers:
         # print(selected_rivers[selected_river])
         all_points = []
@@ -122,119 +178,99 @@ for model_setup in zones:
             # done_rivers.append(selected_rivers[selected_river])
             # print(done_rivers)
             break
+        
+
+        # repeat = True
+
+        channels___ = []
+        recurse_chanels(int(selected_river), channels___)
+        channels___.append(selected_river)
+
+        upstream_rivers[selected_river] = channels___
 
 
-        done_rivers = []
-        repeat = True
-        while repeat:
-            repeat = False
+    sorted_selected_rivers = list(selected_rivers)
+    
+    break_loop = False
+    
+    while not break_loop:
 
-            for index_riv, row_riv in rivers_gpd.iterrows():
-
-                current_river = row_riv['Channel']
-                # if current_river in done_rivers: continue
-
-                for point in all_points:
-                    if (row_riv['geometry'].touches(point['geometry'][0])):
-                        if not current_river in done_rivers:
-                            done_rivers.append(current_river)
-                            x,y = row_riv['geometry'].coords.xy
-
-                            pt = geopandas.GeoDataFrame(geometry=geopandas.points_from_xy([x[-1]],[y[-1]]), crs=rivers_gpd.crs)
-                            pt.to_file(f'{gaged_shapes_dir}/.points/{current_river}_inlet.geojson', driver = "GeoJSON")
-                            all_points.append(pt)
-                            repeat = True
-                            break
+        all_good = False
+        for riv_idx in range(0, len(sorted_selected_rivers) - 1):
+            if len(upstream_rivers[sorted_selected_rivers[riv_idx]]) < len(upstream_rivers[sorted_selected_rivers[riv_idx + 1]]):
+            
+                # print(len(upstream_rivers[sorted_selected_rivers[riv_idx]]), ' vs ', len(upstream_rivers[sorted_selected_rivers[riv_idx + 1]]))
                 
-                if repeat:
-                    break
+                # print(sorted_selected_rivers)
+                # print([len(upstream_rivers[riv]) for riv in sorted_selected_rivers])
+                
+                # print()
+                keep_val = sorted_selected_rivers[riv_idx]
+                del sorted_selected_rivers[riv_idx]
+
+                sorted_selected_rivers.append(keep_val)
+
+                # print(sorted_selected_rivers)
+                # print([len(upstream_rivers[riv]) for riv in sorted_selected_rivers])
+                
+                all_good = False
+                break
+            else:
+                all_good = True
+
+            previous_lengh = len(upstream_rivers[sorted_selected_rivers[riv_idx]])
+        
+        break_loop = True if all_good else False
+
+
+    popped = []
+    for sorted_river in sorted_selected_rivers:
+        
+        popped.append(sorted_river)
+
+        for sorted_river_inner in sorted_selected_rivers:
+
+            if not sorted_river_inner in popped:
+
+                for rnm in upstream_rivers[sorted_river_inner]:
+                    if rnm in upstream_rivers[sorted_river]:
+                        upstream_rivers[sorted_river].remove(rnm)
+
+    for key in upstream_rivers:
 
         data = {
-            "geometry"  : [],
-            "channel"   : [],
-        }
-
-        safe_name = None
+                "geometry"  : [],
+                "channel"   : [],
+            }
         for index_riv, row_riv in rivers_gpd.iterrows():
-            if row_riv['Channel'] in done_rivers:
+            if row_riv['Channel'] in upstream_rivers[key]:
                 data['geometry'].append(row_riv['geometry'])
                 data['channel'].append(row_riv['Channel'])
-                safe_name = selected_rivers[selected_river]
-            if safe_name is None:
-                safe_name = f"{random.randint(1,100)}"
 
         new_network = geopandas.GeoDataFrame(pandas.DataFrame.from_dict(data), geometry='geometry', crs=rivers_gpd.crs)
         create_path(f'{gaged_shapes_dir}/.network/')
-        new_network.to_file(f'{gaged_shapes_dir}/.network/{safe_name}.geojson', driver = "GeoJSON")
-
+        new_network.to_file(f'{gaged_shapes_dir}/.network/{key}.geojson', driver = "GeoJSON")
 
         data = {
             "geometry"  : [],
             "channel"   : [],
         }
         for index, row_lsus in lsus_gpd.iterrows():
-            if row_lsus['Channel'] in done_rivers:
+            if row_lsus['Channel'] in upstream_rivers[key]:
                     data['geometry'].append(row_lsus['geometry'])
                     data['channel'].append(row_lsus['Channel'])
 
         new_lsus = geopandas.GeoDataFrame(pandas.DataFrame.from_dict(data), geometry='geometry', crs=rivers_gpd.crs)
         
-        create_path(f'{gaged_shapes_dir}/{safe_name}/')
-        new_lsus.to_file(f'{gaged_shapes_dir}/{safe_name}/lsus.geojson', driver = "GeoJSON")
+        create_path(f'{gaged_shapes_dir}/{key}/')
+        new_lsus.to_file(f'{gaged_shapes_dir}/{key}/lsus.geojson', driver = "GeoJSON")
+
         new_lsus = new_lsus.dissolve()
-        new_lsus.to_file(f'{gaged_shapes_dir}/{safe_name}.geojson', driver = "GeoJSON")
+        new_lsus['subregionID'] = None
+        new_lsus.loc[0, 'subregionID'] = key
 
-
-
-    # find differences and clip them
-    intersection = True
-
-    past_lsus = []
-    while intersection:
-        # print("master-loop")
-        intersection = False
-        done_lsus = []
-        lsus_all = list_files(f"{lsus_dir}/", 'geojson')
-        for p_lsu_fn in lsus_all:
-            if p_lsu_fn in done_lsus: continue
-            # print("--main-loop--")
-            if p_lsu_fn in past_lsus:
-                continue
-            report(f'\t  - removing overlaps - file: {file_name(p_lsu_fn)}                ', printing = False)
-            for s_lsu_fn in lsus_all:
-                if p_lsu_fn == s_lsu_fn: continue
-                if s_lsu_fn in done_lsus: continue
-
-                primary_lsu = geopandas.read_file(p_lsu_fn)
-                secondary_lsu = geopandas.read_file(s_lsu_fn)
-
-                # print("--second-loop--")
-
-                if len(primary_lsu.clip(secondary_lsu).index) == 0: continue
-                if (primary_lsu.clip(secondary_lsu).iloc[0]['geometry'].area > 0) or (secondary_lsu.clip(primary_lsu).iloc[0]['geometry'].area > 0):
-                    # print(f"\n\t! intersection between \n\t> {p_lsu_fn} and \n\t> {s_lsu_fn}")
-                    done_lsus.append(p_lsu_fn); done_lsus.append(s_lsu_fn)
-                    if primary_lsu.iloc[0]['geometry'].area > secondary_lsu.iloc[0]['geometry'].area:
-                        # report(f"\treplacing: {file_name(p_lsu_fn)}      ")
-                        new_lsu = primary_lsu.difference(secondary_lsu)
-                        delete_file(p_lsu_fn)
-                        new_lsu.to_file(p_lsu_fn, gdriver = "geoJSON")
-                        
-                        intersection = True
-                        break
-                    else:
-                        # report(f"\treplacing: {file_name(s_lsu_fn)}      ")
-                        new_lsu = secondary_lsu.difference(primary_lsu)
-                        delete_file(s_lsu_fn)
-                        new_lsu.to_file(s_lsu_fn, gdriver = "geoJSON")
-                        intersection = True
-                        break
-            if intersection:
-                break   
-            elif not p_lsu_fn in past_lsus:
-                past_lsus.append(p_lsu_fn)
-
-
+        report(f'\t  - saving subregion {key}                               ')
+        new_lsus.to_file(f'{gaged_shapes_dir}/{key}.geojson', driver = "GeoJSON")
 
 print()
 final_major_basins = None
@@ -244,3 +280,10 @@ for continent in all_zones:
     
     if not final_major_basins is None:
         final_major_basins.to_file(f'../model-data/{continent}/major-basins/major-basins.geojson', driver = 'GeoJSON')
+
+
+# save all performance data
+
+if not final_json is None:
+    print(f"\t# preparing global performance for flow shapefile")
+    final_json.to_file(f'../model-data/global/stations.geojson', driver = 'GeoJSON')

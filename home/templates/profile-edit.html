@@ -1,0 +1,148 @@
+{% extends 'main-header.html' %}
+
+{% block content %}
+
+<div class="container" style="padding-top: 100px;">
+    
+    <form action="/my-profile/save" method="post" enctype="multipart/form-data" class = "needs-validation" novalidate>
+        {% csrf_token %}
+
+        <div class="input-group mb-3">
+            <span class="input-group-text" style="width: 150px;">First Name</span>
+            <input required aria-required="true" type="text" {% if myProfile.user.first_name %} value = "{{myProfile.user.first_name}}" {% endif %} class="form-control" placeholder="First Name" aria-label="first_name" name="first_name" id="first_name">
+            <span class="input-group-text" style="width: 150px;">Last Name</span>
+            <input required aria-required="true" type="text" {% if myProfile.user.last_name %} value = "{{myProfile.user.last_name}}" {% endif %} class="form-control" placeholder="Last Name" aria-label="last_name" name="last_name" id="last_name">
+        </div>
+
+        {% if myProfile.image %}
+            <img src="/images/{{myProfile.image}}" style="min-width: 300px; max-width: 370px; height: auto; padding-top: 20px; padding-bottom: 20px;" alt="Profile Picture">
+        {% else %}
+            <img src="/images/profile_img.png" style="min-width: 300px; max-width: 370px; height: auto; padding-top: 20px; padding-bottom: 20px;" alt="Profile Picture">
+        {% endif %}
+
+                
+        <div class="input-group" style="padding-bottom: 60px;">
+            <input type="file" class="form-control" id="file_name_" name="file_name_" aria-describedby="file_name_" aria-label="Upload">
+        </div>
+
+        <div class="input-group mb-3">
+            <span class="input-group-text" style="width: 150px;">Country</span>
+            <input type="text" class="form-control" placeholder="Enter New Country to Update (Please, update both city and country)" aria-label="country" name="country" id="country">
+            <span class="input-group-text" style="width: 150px;">City</span>
+            <input type="text" class="form-control" placeholder="Enter New City to Update (Please, update both city and country)" aria-label="city" name="city" id="city">
+        </div>
+
+        <!-- <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1" style="width: 150px;">Username</span>
+            <input type="text" {% if myProfile.user.username %} value = "{{myProfile.user.username}}" {% endif %}  class="form-control" placeholder="Username" aria-label="username" name="username" id="username" aria-describedby="basic-addon1">
+        </div> -->
+
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1" style="width: 150px;">Email Address</span>
+            <input required aria-required="true" type="email" {% if myProfile.user.email %} value = "{{myProfile.user.email}}" {% endif %}  class="form-control" placeholder="Email Address" aria-label="email" name="email" id="email" aria-describedby="basic-addon1">
+        </div>
+
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1" style="width: 150px;">Personal Link</span>
+            <input type="text" {% if myProfile.user.personal_link %} value = "{{myProfile.user.personal_link}}" {% endif %}  class="form-control" placeholder="Personal Link" aria-label="link" name="link" id="link" aria-describedby="basic-addon1">
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text" style="width: 150px;">Bio</span>
+            <textarea {% if myProfile.user.bio %} value = "{{myProfile.user.bio}}" {% endif %}  class="form-control" aria-label="With textarea" rows="8" aria-label="bio" name="bio" id="bio"></textarea>
+        </div>
+
+
+        <script>
+            // Example starter JavaScript for disabling form submissions if there are invalid fields
+            (function () {
+            'use strict'
+
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.querySelectorAll('.needs-validation')
+
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+                })
+            })()
+        </script>
+
+        <div class="col-12" style="margin-top: 20px;">
+            <button class="btn btn-primary" style="background-color: #1f4872; outline: #102f4d; border: #102f4d; margin: 0%;" type="submit">Save Changes</button>
+        </div>
+
+    </form>
+
+    <!-- <div class="basic-info">
+        <h5>{{myProfile.user.first_name}} {{myProfile.user.last_name}}</h5>
+        {% if myProfile.image %}
+            <img src="/images/{{myProfile.image}}" style="min-width: 170px; max-width: 200px; height: auto;" alt="Profile Picture">
+        {% else %}
+            <img src="/images/profile_img.png" style="min-width: 170px; max-width: 200px; height: auto;" alt="Profile Picture">
+        {% endif %}
+        <div class="flex-contents" style="margin-top: 20px;">
+            <div style="width:150px;">Personal Link</div>
+            <div style="width:2px; padding-right: 10px;">:</div>
+            <div>
+                {% if myProfile.link %}
+                    {{myProfile.link}}
+                {% else %}
+                    You have no Link to display on your profile
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="flex-contents" style="margin-top: 3px;">
+            <div style="width:150px;">Username</div>
+            <div style="width:2px; padding-right: 10px;">:</div>
+            <div>
+                {% if myProfile.user.username %}
+                    {{myProfile.user.username}}
+                {% else %}
+                    You have no 'username'
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="flex-contents" style="margin-top: 3px;">
+            <div style="width:150px;">Email Address</div>
+            <div style="width:2px; padding-right: 10px;">:</div>
+            <div>
+                {% if myProfile.user.email %}
+                    {{myProfile.user.email}}
+                {% else %}
+                    You have no email address
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="padding-top: 30px;">
+            {% if myProfile.bio %}
+                {{myProfile.bio|safe}}
+            {% else %}
+                You have not posted any description for your profile.
+            {% endif %}
+        </div>
+
+        <div style="padding-top: 30px;">
+            <a href="/my-profile/edit" class="cj-nav-link" style="margin-left: 0px; padding:0px;">Edit Your Profile</a> <br>
+            <a href="/my-profile/requests" class="cj-nav-link" style="margin-left: 0px; padding:0px;">Manage Your Requests</a>
+        </div>
+    </div> -->
+
+
+</div>
+
+
+
+
+{% endblock %}

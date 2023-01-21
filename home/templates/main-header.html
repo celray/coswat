@@ -26,7 +26,7 @@
 
 </head>
 <body>
-    <div class="nav blue-accent-bg">
+    <div class="nav acrylic">
         <div class="container inner_nav flex-contents">
             <a class="logo contain-image" style="background-image: url('/images/logo.png');" href="/">
 
@@ -42,7 +42,7 @@
                     <a href="/scripts"      class="{% if index == 3 %} active-link {% else %} cj-nav-link {% endif %}">Scripts</a>
                     <a href="/outputs"      class="{% if index == 4 %} active-link {% else %} cj-nav-link {% endif %}">Outputs</a>
                     <a href="/calibration"  class="{% if index == 5 %} active-link {% else %} cj-nav-link {% endif %}">Calibration</a>
-                    <a href="/about"        class="{% if index == 6 %} active-link {% else %} cj-nav-link {% endif %}">About</a>
+                    <a href="/about"        class="{% if index == 6 %} active-link {% else %} cj-nav-link {% endif %}" style="padding-right: 10px;">About</a>
                 </div>
 
                 <div id="profile_avatar" class="profile-avatar" >
@@ -171,15 +171,15 @@
     </div>
 
     
-    <div class="main cover-image" >
-        <div class="contents"> <!-- style="background-image: url('container_div_bg.png');" -->
+    <div class="main cover-image" style="width: 100%; height: 100%;">
+        <div class="contents" style="width: 100%; height: 100%;"> <!-- style="background-image: url('container_div_bg.png');" -->
             {% block content %} 
             
             {% endblock %}
         </div>
     </div>
     
-    {% if details_pannel %}
+    <!-- {% if details_pannel %}
         <div id="info-pannel" class="info-pannel flex-contents shadow">
             <div class="text-pannel">
                 <div class="row-div flex-contents">
@@ -203,9 +203,9 @@
             </div>
 
         </div>
-    {% endif %}
+    {% endif %} -->
 
-    <div class="footer orange-accent-bg">
+    <div class="footer acrylic">
         <a href="https://celray.chawanda.com">© Web Design: Celray James CHAWANDA</a>
     </div>
 

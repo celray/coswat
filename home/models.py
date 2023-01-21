@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.files.storage import FileSystemStorage
-from coswat.settings import IMAGES_DIR
+from coswat.settings import IMAGES_DIR, PROFILE_PICTURES_DIR
 import datetime
 from django.utils.timezone import make_aware
 from django.conf import settings
@@ -9,14 +9,13 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User
 
 picture_files_dir           = FileSystemStorage(location = IMAGES_DIR)
-profile_picture_files_dir   = FileSystemStorage(location = IMAGES_DIR)
+profile_picture_files_dir   = FileSystemStorage(location = PROFILE_PICTURES_DIR)
 
 
 data_type = (
                 ('Setup Data', 'Setup Data'),
                 ('Calibration Data', 'Calibration Data'),
             )
-
 
 
 class profile(models.Model):
@@ -28,7 +27,8 @@ class profile(models.Model):
     image           = models.ImageField(default=None, blank=True, null=True, storage = profile_picture_files_dir)
 
     personal_link   = models.CharField(max_length=1000, null=True, blank=True)
-    bio             = models.CharField(max_length=1000, null=True, blank=True)
+    location        = models.CharField(max_length=1000, null=True, blank=True)
+    bio             = models.CharField(max_length=1000000, null=True, blank=True)
 
     date_joined     = models.DateTimeField(default = None, null=True, blank=True)
     
@@ -75,6 +75,33 @@ class model_data(models.Model):
     class Meta:
         ordering        = ('id',)
         verbose_name    = "Model Data Source"
+
+
+
+class welcome(models.Model):
+
+    heading     = models.CharField(max_length=100000, null=False, blank=False)
+    text        = models.TextField(max_length=100000, null=False, blank=False)
+
+    def __str__(self):
+        return self.heading
+    class Meta:
+        ordering        = ('id',)
+        verbose_name    = "Welcome Message"
+
+
+
+
+class about(models.Model):
+
+    description     = models.TextField(max_length=100000, null=False, blank=False)
+    image           = models.ImageField(default = None, blank=True, null=True, storage = picture_files_dir)
+
+    def __str__(self):
+        return 'about'
+    class Meta:
+        ordering        = ('id',)
+        verbose_name    = "About CoSWAT-GM"
 
 
 

@@ -160,20 +160,20 @@
     }
 
 .blue-accent-login{
-    background: linear-gradient(90deg, #ffffff00, #fffdfd3b, #0522831f, #b1c1ff4f,  #ffffff98, #3a559500);
+    background: linear-gradient(90deg, #ffffffa6, #fffdfdbb, #e0e1e4bb, #909192bb,  #ffffffbb, #919192bb);
     background-size: 230%;
     animation: bgMarquee 25s linear infinite ;
     }
-    @keyframes bgMarquee{
+    /* @keyframes bgMarquee{
         0%{background-position-x: 0%;}
         25%{background-position-x: 110%;}
         50%{background-position-x: 0%;}
         75%{background-position-x: -110%;}
         100%{background-position-x: 0%;}
-    }
+    } */
 
 .orange-accent-bg{
-    background: linear-gradient(90deg, #ffffff33, #c0a89f33, #79331e67, #83330579, #a3542762, #f0f0f065, #95543a65, #955e3a00);
+    background: linear-gradient(90deg, #ffffff00, #c0a89f33, #79331e67, #83330579, #a3542762, #f0f0f065, #95543a65, #ffffff00);
     background-size: 180%;
     animation: bgMarquee 25s linear infinite ;
     }
@@ -538,7 +538,7 @@
     margin-left: 20px;
     width: calc(100% - 80px);
     max-height: calc(100% - 50px);
-    /* background-color: transparent; */
+    background-color: transparent;
     border-radius: 0px;
     border-color: transparent;
 
@@ -650,4 +650,15 @@
 .default-0h{
     height: 0px;
     overflow: hidden;
+}
+
+
+.left_split{
+    text-align: right;
+    width: 50%;
+}
+
+.right_split{
+    text-align: left;
+    width: 50%;
 }

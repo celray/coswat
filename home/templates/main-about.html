@@ -3,13 +3,20 @@
 {% block content %}
 
 
+    <div class="container" style="padding-top: 100px;">
 
+        {% if about %}
+            <img style="float: left; margin: 0px 20px 10px 0px; min-width: 250px; max-width: 320px; height: auto;"
+                src="/images/{{about.image}}" alt="Longtail boat in Thailand">
+        {% endif %}
 
+        <p style="text-align: justify;">
 
+            {{about.description|safe}}
 
+        </p>
 
-
-
+    </div>
 
 
 {% endblock %}

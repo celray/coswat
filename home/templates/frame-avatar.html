@@ -1,5 +1,17 @@
 <div class="profile-bounds">
-    <div class="profile-image contain-image" onclick="{% if user.is_authenticated %} show_profile_dropdown() {% else %} request_login() {% endif %}" style="background-image: url('/images/profile_img.png'); cursor: pointer;"></div>
+    <div class="profile-image contain-image" onclick="{% if user.is_authenticated %} show_profile_dropdown() {% else %} request_login() {% endif %}"
+        style="background-image: url(
+            {% if user.is_authenticated %}
+                {% if user.profile.image %}
+                    '/images/{{user.profile.image}}'
+                {% else %}
+                    '/images/profile_img.png'
+                {% endif %}
+            {% else %}
+                '/images/profile_img.png'
+            {% endif %}
+        ); cursor: pointer;"></div>
+        
 </div>
 
 <div id="profile-menu" class="shadow-lg blue-accent-login default-0h">
@@ -13,7 +25,7 @@
         {% endif %}
 
         <li class="profile-link" onclick="show_profile_dropdown()"><a href="#">My Requests</a></li>
-        <li class="profile-link" onclick="show_profile_dropdown()"><a href="#">Profile Details</a></li>
+        <li class="profile-link" onclick="show_profile_dropdown()"><a href="/my-profile">Profile Details</a></li>
         <li class="profile-link" onclick="show_profile_dropdown()"><a href="#">Settings</a> </li>
         <li class="profile-link" onclick="show_profile_dropdown(); logout_user()"><a href="#">Log Out</a></li>
     </ul>

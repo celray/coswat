@@ -1,4 +1,4 @@
-
+#!/bin/python3
 
 from cjfx import *
 ignore_warnings()

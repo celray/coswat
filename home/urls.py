@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
 
     # assets paths
+    path('favicon.ico', views.get_favicon, name='favicon'),
     re_path(r'css/(?P<file_name>[A-Za-z0-9&\&\%\s\-._\']+)', views.get_css, name = 'get_css'),
     re_path(r'js/(?P<file_name>[A-Za-z0-9&\&\%\s\-._\']+)', views.get_js, name = 'get_js'),
     re_path(r'images/(?P<file_name>[A-Za-z0-9&\&\%\s\-._\']+)', views.get_images, name = 'images_view'),
@@ -13,11 +14,13 @@ urlpatterns = [
 
     re_path(r'layer_loader_frame/(?P<continent>[A-Za-z0-9&\&\%\s\-._\']+)/(?P<major_id>[A-Za-z0-9&\&\%\s\-._\']+)', views.load_gaged_shapes, name = 'load_gaged_shapes'),
 
+    re_path(r'continents/(?P<continent>[A-Za-z0-9&\&\%\s\-._\']+)/(?P<subbasin>[A-Za-z0-9&\&\%\s\-._\']+)/sub-region/(?P<subregion_id>[A-Za-z0-9&\&\%\s\-._\']+)', views.get_subregion_shape, name = 'get_subregion_shape'),
     re_path(r'continents/(?P<continent>[A-Za-z0-9&\&\%\s\-._\']+)/gaged-lsus/(?P<major_id>[A-Za-z0-9&\&\%\s\-._\']+)/(?P<lsu_id>[A-Za-z0-9&\&\%\s\-._\']+)', views.get_gaged_lsu, name = 'get_gaged_lsu'),
     re_path(r'continents/(?P<continent>[A-Za-z0-9&\&\%\s\-._\']+)/basin-streams/(?P<basin_file>[A-Za-z0-9&\&\%\s\-._\']+)', views.get_subbasin_file, name = 'get_subbasin_file'),
     re_path(r'continents/(?P<continent>[A-Za-z0-9&\&\%\s\-._\']+)/major-basins/major-basins.geojson', views.get_major_subbasins_file, name = 'get_major_subbasins_file'),
     re_path(r'continents/(?P<continent>[A-Za-z0-9&\&\%\s\-._\']+)/(?P<file_name>[A-Za-z0-9&\&\%\s\-._\']+)', views.get_continent_file, name = 'get_continent_file'),
     re_path(r'continents/(?P<file_name>[A-Za-z0-9&\&\%\s\-._\']+)', views.get_continents, name = 'get_continents'),
+    re_path(r'graph/region_(?P<zone>[A-Za-z0-9&\&\%\s\-._\']+)-(?P<channel>[A-Za-z0-9&\&\%\s\-._\']+)-(?P<station_id>[A-Za-z0-9&\&\%\s\-._\']+).png', views.get_hydrograph, name = 'get_hydrograph'),
 
     # page paths
     path('', views.home_map, name='home_map'),
@@ -26,6 +29,10 @@ urlpatterns = [
     path('outputs', views.outputs, name='outputs'),
     path('calibration', views.calibration, name='calibration'),
     path('about', views.about, name='about'),
+
+    path('my-profile/save', views.edit_profile, name='edit_profile'),
+    path('my-profile/edit', views.edit_profile, name='edit_profile'),
+    path('my-profile', views.my_profile, name='my_profile'),
 
     path('signin', views.signin, name='signin'),
     path('signout', views.signout, name='signout'),

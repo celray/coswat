@@ -12,3 +12,18 @@ class model_data_src_admin(SummernoteModelAdmin):
 admin.site.register(models.model_data, model_data_src_admin)
 
 
+class about_admin(SummernoteModelAdmin):
+    list_display = []
+    summernote_fields = '__all__'
+
+admin.site.register(models.about, about_admin)
+
+
+
+class welcome_admin(SummernoteModelAdmin):
+    list_display = ['heading']
+    summernote_fields = '__all__'
+
+admin.site.register(models.welcome, welcome_admin)
+
+

@@ -1,0 +1,86 @@
+{% extends 'main-header.html' %}
+
+{% block content %}
+
+<div class="container" style="padding-top: 100px;">
+
+    <div class="basic-info">
+        <h5>{{myProfile.user.first_name}} {{myProfile.user.last_name}}</h5>
+        {% if myProfile.image %}
+            <img src="/images/{{myProfile.image}}" style="min-width: 170px; max-width: 200px; height: auto;" alt="Profile Picture">
+        {% else %}
+            <img src="/images/profile_img.png" style="min-width: 170px; max-width: 200px; height: auto;" alt="Profile Picture">
+        {% endif %}
+        
+        <!--         
+        <div class="flex-contents" style="margin-top: 20px;">
+            <div style="width:150px;">Username</div>
+            <div style="width:2px; padding-right: 10px;">:</div>
+            <div>
+                {% if myProfile.user.username %}
+                    {{myProfile.user.username}}
+                {% else %}
+                    You have no 'username'
+                {% endif %}
+            </div>
+        </div> -->
+
+        <div class="flex-contents" style="margin-top: 3px;">
+            <div style="width:150px;">Email Address</div>
+            <div style="width:2px; padding-right: 10px;">:</div>
+            <div>
+                {% if myProfile.user.email %}
+                    {{myProfile.user.email}}
+                {% else %}
+                    You have no email address
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="flex-contents" style="margin-top: 3px;">
+            <div style="width:150px;">Personal Link</div>
+            <div style="width:2px; padding-right: 10px;">:</div>
+            <div>
+                {% if myProfile.link %}
+                    {{myProfile.link}}
+                {% else %}
+                    You have no Link to display on your profile
+                {% endif %}
+            </div>
+        </div>
+
+
+        <div class="flex-contents" style="margin-top: 3px;">
+            <div style="width:150px;">Location</div>
+            <div style="width:2px; padding-right: 10px;">:</div>
+            <div>
+                {% if myProfile.location %}
+                    {{myProfile.location}}
+                {% else %}
+                    You have not added location to your profile
+                {% endif %}
+            </div>
+        </div>
+
+
+        <div style="padding-top: 30px;">
+            {% if myProfile.bio %}
+                {{myProfile.bio|safe}}
+            {% else %}
+                You have not posted any description for your profile.
+            {% endif %}
+        </div>
+
+        <div style="padding-top: 30px;">
+            <a href="/my-profile/edit" class="cj-nav-link" style="margin-left: 0px; padding:0px;">Edit Your Profile</a> <br>
+            <a href="/my-profile/requests" class="cj-nav-link" style="margin-left: 0px; padding:0px;">Manage Your Requests</a>
+        </div>
+    </div>
+
+
+</div>
+
+
+
+
+{% endblock %}

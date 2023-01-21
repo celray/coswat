@@ -2,14 +2,568 @@
 
 {% block content %}
 
+    <div class="map-frame">
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <style>
+        .action-pannel{
+            background-color: #50000050;
+
+            position: absolute;
+            border-radius: 0px;
+            bottom: 80px;
+            /* left: calc(50% - 40%); */
+            z-index: 2000;
+
+            -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+            background-blend-mode: exclusion;
+
+            width: calc(100% + 0px);
+            height: 200px;
+            
+            animation: bring_action_pannel 0.9s linear;
+            }
+            @keyframes bring_action_pannel{
+                0% {
+                        height: 0px;
+                        bottom: 160px;
+                    }
+                10% {
+                        height: 1.5px;
+                        bottom: 160px;
+                    }
+                
+                100% {
+                        height: 200px;
+                        bottom: 80px;
+                    }
+            }
+
+            @keyframes hide_action_pannel{
+                0% {
+                        /* height: 0px;
+                        bottom: 160px; */
+
+                        height: 200px;
+                        bottom: 80px;
+                        opacity: 1;
+                    }
+                90% {
+                        height: 0px;
+                        bottom: 160px;
+                        opacity: 1;
+                    }
+
+                100% {
+                        height: 20px;
+                        bottom: 140px;
+                        opacity: 0px;
+                    }
+            }
+
+        .action-pannel div{
+            opacity: 1;
+            animation: reveal 1.2s linear;
+            }
+
+            @keyframes reveal {
+                0% {opacity: 0;}
+                80% {opacity: 0;}
+                100% {opacity: 1;}
+                }
+    </style>
 
 
 
+    <div class="" id="action-pannel">
+        <div class="heading-info flex-contents" style="height: 70px; width: 100%; text-align: center; padding-top: 5px;">
+            <div style="width: 30%;"></div>
+            <div style="width: 40%;">
+                <div style="text-align: center; width: 100%;">
+                    <h6 style="text-align: center; font-size: 14px;">Continent: <span id="continent-id"></span> - Region: <span id="basin-id"></span> </h6>
+                    <h6 style="font-size: 14px;">Selected Sub-Region: <span id="subbasin-id"></span></h6>
+                </div>
+                <hr style="width: 100%; height: 2px; margin-top: 0px;">
+            </div>
+            <div style="width: 30%;"></div>
+        </div>
+        <div class="row" style="width: 100%; height: calc(100% - 70px); font-size: 14px;">
+            <div class="d-none d-sm-block col col-md-1  col-lg-2 left-action"></div>
+            <div class="col col-sm-12 col-md-10 col-lg-8 center-action row">
+            
+                <div class="col" style="text-align: right;">
+                    <div style="margin-bottom: 5px; margin-top: 0px;">Extraction</div>
+                    
+                    <div style="height: 36px;" class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                        <input type="radio" class="btn-check" name="btnradioB" id="btnradio1" autocomplete="off">
+                        <label style="font-size: 14px;" class="btn btn-outline-primary" for="btnradio1">Entire Region</label>
+                        
+                        <input type="radio" class="btn-check" name="btnradioB" id="btnradio2" autocomplete="off" checked>
+                        <label style="font-size: 14px;" class="btn btn-outline-primary" for="btnradio2">Sub-Region</label>
+                      
+                    </div> <br> <br>
+
+                    <a href="#">Send Extraction Request</a>
+                </div>
+                <div class="col" style="min-width: 600px;">
+                    <div class="upload-data-page">
+                        <div style="text-align: center;">Upload Calibration Files</div>
+
+                        <div class="input-group" style="margin-top: 5px;" style="height: 36px;">
+                            <select class="form-select" id="inputGroupSelect01" style="font-size: 14px; border-radius: 6px 0px 0px 6px;">
+                              <option selected>Select One...</option>
+                              <option value="1">calibration.cal</option>
+                              <option value="1">management.mgt</option>
+                              <option value="2">plants.ini</option>
+                              <option value="3">lum.dtl</option>
+                              <option value="4">res_rel.dtl</option>
+                            </select>
+                            <input class="form-control" style="width: 170px; border-radius: 0px 6px 6px 0px;" type="file" id="formFile">
+                        </div>
+                        <div style="height: 12px; width: 100%;"></div>
+
+                        <div class="flex-contents" style="width: 100%; padding-left: 95px; height: 36px;">
+                            <div class="btn-group" role="group" style="width: 240px;" aria-label="Basic radio toggle button group">
+                                <input type="radio" class="btn-check" name="btnradioA" id="btnradio3" autocomplete="off">
+                                <label style="font-size: 14px;" class="btn btn-outline-primary" for="btnradio3">Entire Region</label>
+                                
+                                <input type="radio" class="btn-check" name="btnradioA" id="btnradio4" autocomplete="off" checked>
+                                <label style="font-size: 14px;" class="btn btn-outline-primary" for="btnradio4">Sub-Region</label>
+                            </div>
+    
+                            <div class="submit-div" style="padding-top: 8px; padding-left: 10px;">
+                                <a href="#">Upload Calibration File</a>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    
+                
+                
+                </div>
+                <div class="col" style="overflow: hidden; height: 120px;">
+                    <h6>Recent Contributions</h6>
+                    <div style="margin-left: 10px; text-align: left; font-size: 15px;">
+                        <div>None</div>
+                        <!-- <div>FirstName LastName - 5^, 5-</div>
+                        <div>FirstName LastName - 5^, 5-</div>
+                        <div>FirstName LastName - 5^, 5-</div>
+                        <div>FirstName LastName - 5^, 5-</div>
+                        <div>FirstName LastName - 5^, 5-</div>
+                        <div>FirstName LastName - 5^, 5-</div>
+                        <div>FirstName LastName - 5^, 5-</div>
+                        <div>FirstName LastName - 5^, 5-</div> -->
+                    </div>
+                
+                </div>
+            
+            
+            
+            
+            </div>
+            <div class="d-none d-sm-block col col-md-1  col-lg-2 right-action"></div>
+        </div>
+    </div>
+
+    <script>
+        var map = L.map('map',{
+            zoomControl:false,
+        }).setView([15.0, 14.0], 2.8);
+
+        var continent = ''
+        var sub_basin = ''
+
+        var continent_lookup = {
+            africa: "Africa",
+            europe: "Europe",
+            asia: "Asia",
+            australia: "Australia",
+            'south-america': "South America",
+            'north-america': "North America",
+            'america': "America",
+        };
+
+        // create map panes for layer order
+        map.createPane('base'); map.getPane('base').style.zIndex                = 100;
+        map.createPane('continents'); map.getPane('continents').style.zIndex    = 102;
+        map.createPane('continent'); map.getPane('continent').style.zIndex      = 104;
+        map.createPane('majorbasin'); map.getPane('majorbasin').style.zIndex    = 106;
+        map.createPane('subbasin'); map.getPane('subbasin').style.zIndex        = 108;
+        map.createPane('gaged_lsu'); map.getPane('gaged_lsu').style.zIndex      = 110;
+        map.createPane('lsu'); map.getPane('lsu').style.zIndex                  = 112;
+        map.createPane('hru'); map.getPane('hru').style.zIndex                  = 114;
+        map.createPane('river'); map.getPane('river').style.zIndex              = 116;
+        map.createPane('lake'); map.getPane('lake').style.zIndex                = 118;
+        map.createPane('gaugingstation'); map.getPane('gaugingstation').style.zIndex = 108;
+
+        
+        var continentsLayer     = load_layer("/continents/all_continents.geojson",                          'base',       on_each_feature_ = zoom_continent, fill_color_ = '#3b3b3b',   color_ = '#ffffff', fill_opacity_ = 1, opacity_ = 1, weight_ = 0.4)
+        var continentLayer      = load_layer("/continents/{{continent}}/continent.geojson",                 'continent',  on_each_feature_ = "None",         fill_color_ = '#e77212',   color_ = '#ffffff',  fill_opacity_ = 1, opacity_ = 1, weight_ = 0.4)
+        var basinsLayer         = load_layer("/continents/{{continent}}/major-basins/major-basins.geojson", 'majorbasin', on_each_feature_ = zoom_subbasin,  fill_color_ = '#be8e6191', color_ = '#afb7b891', fill_opacity_ = 0.1,opacity_ = 1, weight_ = 0.4)
+
+        var subbasinsLayer = null;
+        var gagedLsu = null;
+        var lsusLayer = null;
+        var hrusLayer = null;
+       
+        
+        // var gagedLsu = new L.GeoJSON.AJAX("assets/africa/major-basins/major-basins/107/22382.geojson", {
+        //     pane: 'gaged_lsu',
+        //     style: { fillColor: '#a80000', color: '#a80000', fillOpacity: 0.1, weight: 0.4, opacity: 1, dashArray: '0', }
+        // });  
+        
+        // var lsusLayer = new L.GeoJSON.AJAX("assets/africa/major-basins/major-basins/107/22382/lsus.geojson", {
+        //     pane: 'lsu',
+        //     style: { fillColor: '#a0a0a0', color: '#008d00da', fillOpacity: 0.01, weight: 0.4, opacity: 1, dashArray: '0', }
+        // });  
+        
+        // var hrusLayer = new L.GeoJSON.AJAX("assets/africa/major-basins/major-basins/107/22382/hrus.geojson", {
+        //     pane: 'hru',
+        //     style: { fillColor: '#a0a0a0', color: '#3b3b3b', fillOpacity: 0.2, weight: 0.4, opacity: 0.2, dashArray: '0', }
+        // });  
+        
+        
+        var lakesLayer = new L.GeoJSON.AJAX("/continents/lakes.geojson", {
+            pane: 'lake',
+            style: { fillColor: '#28a0d8', color: '#0a94d4', fillOpacity: 0.7, weight: 0.4, opacity: 1, dashArray: '0', }
+        });  
+        
+        
+        var majorriversLayer = new L.GeoJSON.AJAX("/continents/{{continent}}/major-rivers.geojson", {
+            pane: 'river',
+            style: { fillColor: '#2987b3', color: '#2987b3', fillOpacity: 0.7, weight: 0.8, opacity: 1, dashArray: '0', }
+        });
+        
+        var riversLayer = null;
+
+        layer_add(continentsLayer);
+        layer_add(continentLayer);
+        layer_add(lakesLayer);
+        layer_add(majorriversLayer);
+        layer_add(riversLayer);
+        // gagedLsu.addTo(map);
+        // lsusLayer.addTo(map);
+        // subbasinsLayer.addTo(map);
+        
+        var global_level    = 3;
+        var basins_level    = 5;
+        var subbasins_level = 6;
+        var gaged_level     = 7;
+        var lsus_level      = 8;
+        var hrus_level      = 13;
+
+        function layer_add(layer){
+            if (layer == null){
+                return
+            }
+            if (map.hasLayer(layer)){}
+            else {
+                map.addLayer(layer);
+            }
+        }
+
+        function layer_remove(layer){
+            if (layer == null){
+                return
+            }
+            if (map.hasLayer(layer)) {
+                map.removeLayer(layer);
+            }
+        }
 
 
+        map.on("zoomend", function() {
+            var zoomlevel = map.getZoom();
+
+            if (zoomlevel <= global_level){
+                layer_add(continentsLayer);
+                layer_add(continentLayer);
+                layer_add(lakesLayer);
+
+                layer_add(majorriversLayer);
+                layer_add(basinsLayer);
+                
+                layer_add(subbasinsLayer);
+                layer_remove(riversLayer);
+                layer_add(gagedLsu);
+                
+                layer_add(lsusLayer);
+                layer_remove(hrusLayer);
+            }
+
+            if ((zoomlevel > global_level) & (zoomlevel <= basins_level)){
+                layer_add(continentsLayer);
+                layer_add(continentLayer);
+                layer_add(lakesLayer);
+
+                layer_remove(majorriversLayer);
+                layer_add(basinsLayer);
+                
+                layer_add(subbasinsLayer);
+                layer_add(riversLayer);
+                layer_add(gagedLsu);
+                
+                layer_add(lsusLayer);
+                layer_remove(hrusLayer);
+            }
+
+            
+            if ((zoomlevel > basins_level) & (zoomlevel <= subbasins_level)){
+                layer_add(continentsLayer);
+                layer_add(continentLayer);
+                layer_add(lakesLayer);
+
+                layer_remove(majorriversLayer);
+                layer_add(basinsLayer);
+                
+                layer_add(subbasinsLayer);
+                layer_add(riversLayer);
+                layer_add(gagedLsu);
+                
+                layer_add(lsusLayer);
+                layer_remove(hrusLayer);
+            }
+
+            if ((zoomlevel > subbasins_level) & (zoomlevel <= gaged_level)){
+                layer_add(continentsLayer);
+                layer_add(continentLayer);
+                layer_add(lakesLayer);
+
+                layer_remove(majorriversLayer);
+                layer_add(basinsLayer);
+                
+                layer_add(subbasinsLayer);
+                layer_add(riversLayer);
+                layer_add(gagedLsu);
+                
+                layer_add(lsusLayer);
+                layer_remove(hrusLayer);
+            }
+            
+            if ((zoomlevel > gaged_level) & (zoomlevel <= lsus_level)){
+                layer_add(continentsLayer);
+                layer_add(continentLayer);
+                layer_add(lakesLayer);
+
+                layer_remove(majorriversLayer);
+                layer_add(basinsLayer);
+                
+                layer_add(subbasinsLayer);
+                layer_add(riversLayer);
+                layer_add(gagedLsu);
+                
+                layer_add(lsusLayer);
+                layer_remove(hrusLayer);
+            }
+
+            if ((zoomlevel > lsus_level) & (zoomlevel <= hrus_level)){
+                layer_add(continentsLayer);
+                layer_add(continentLayer);
+                layer_add(lakesLayer);
+
+                layer_remove(majorriversLayer);
+                layer_add(basinsLayer);
+                
+                layer_add(subbasinsLayer);
+                layer_add(riversLayer);
+                layer_add(gagedLsu);
+                
+                layer_add(lsusLayer);
+                layer_remove(hrusLayer);
+            }
+            
+            console.log("Current Zoom Level = " + zoomlevel);
+        });
+
+        function zoom_continent(feature, layer) {
+            layer.bindTooltip(feature.properties.CONTINENT);
+            layer.on('mouseover', function(e){
+                layer.openTooltip;
+                console.log(feature.properties.CONTINENT)
+            });
+            layer.on('click', function(e) {
+
+                hide_action_panel();
+
+                console.log(feature.properties.CONTINENT)
+                continent = feature.properties.CONTINENT;
+                reset_subbasins()
+                // window.location.href ='/zoom-region/' + feature.properties.CONTINENT;
+
+                layer_remove(continentLayer);
+                layer_remove(basinsLayer);
+                layer_remove(majorriversLayer);
+
+                continentLayer      = load_layer("/continents/" + feature.properties.CONTINENT + "/continent.geojson",                 'continent',  on_each_feature_ = "None",         fill_color_ = '#e77212',   color_ = '#ffffff',  fill_opacity_ = 1, opacity_ = 1, weight_ = 0.4)
+                basinsLayer         = load_layer("/continents/" + feature.properties.CONTINENT + "/major-basins/major-basins.geojson", 'majorbasin', on_each_feature_ = zoom_subbasin,  fill_color_ = '#be8e6191', color_ = '#afb7b891', fill_opacity_ = 0.1,opacity_ = 1, weight_ = 0.4)
+                
+                majorriversLayer = new L.GeoJSON.AJAX("/continents/" + continent + "/major-rivers.geojson", {
+                    pane: 'river',
+                    style: { fillColor: '#2987b3', color: '#2987b3', fillOpacity: 0.7, weight: 0.8, opacity: 1, dashArray: '0', }
+                });
+
+                layer_add(continentLayer)
+                layer_add(basinsLayer)
+                layer_add(majorriversLayer)
 
 
+                // update info pannel
+                var continent_div = document.getElementById('continent-id')
+                var basin_div = document.getElementById('basin-id')
+                var subbasin_div = document.getElementById('subbasin-id')
+
+                continent_div.innerText = continent_lookup[continent];
+                basin_div.innerText = "None Selected";
+                subbasin_div.innerText = "None Selected";
+            });
+        };
+        function zoom_subregion(feature, layer) {
+            layer.bindTooltip("Sub Region: " + String(feature.properties.subregionID));
+            // layer.bindTooltip("Basin: " + feature.properties.name);
+            layer.on('mouseover', function(e){
+                layer.openTooltip;
+            });
+            layer.on('click', function(e) {
+
+                show_action_panel(false);
+                console.log(feature.properties.name)
+                console.log("/continents/" + continent + "/" + sub_basin + "/sub-region/" + String(feature.properties.subregionID))
+
+                
+                layer_remove(lsusLayer);
+                lsusLayer = load_layer("/continents/" + continent + "/" + sub_basin + "/sub-region/" + String(feature.properties.subregionID),
+                'lsu',  on_each_feature_ = "None",         fill_color_ = '#1ed705',   color_ = '#1ed705',  fill_opacity_ = 1, opacity_ = 1, weight_ = 0.4)
+                layer_add(lsusLayer);
+                
+                // update info pannel
+                var continent_div = document.getElementById('continent-id')
+                var basin_div = document.getElementById('basin-id')
+                var subbasin_div = document.getElementById('subbasin-id')
+
+                continent_div.innerText = continent_lookup[continent];
+                basin_div.innerText = sub_basin;
+                subbasin_div.innerText = String(feature.properties.subregionID);
+            });
+        };
+        function zoom_subbasin(feature, layer) {
+            layer.bindTooltip("Basin: " + feature.properties.name[0].toUpperCase() + feature.properties.name.substring(1));
+            // layer.bindTooltip("Basin: " + feature.properties.name);
+            layer.on('mouseover', function(e){
+                layer.openTooltip;
+            });
+
+            layer.on('click', function(e) {
+                show_action_panel(true);
+
+                sub_basin = String(feature.properties.name)
+                console.log(feature.properties.name)
+                console.log("/continents/" + continent + "/basin-streams/" + sub_basin + "-streams.geojson")
+                
+                var basin_div = document.getElementById('basin-id')
+                var subbasin_div = document.getElementById('subbasin-id')
+
+                basin_div.innerText = sub_basin[0].toUpperCase() + sub_basin.substring(1);
+                subbasin_div.innerText = "None Selected";
+
+                // load related data and show
+                console.log('clearing layers...')
+                layer_remove(riversLayer);
+                layer_remove(subbasinsLayer);
+                layer_remove(gagedLsu);
+                reset_subbasins();
+
+                riversLayer = null;
+                subbasinsLayer = null;
+                gagedLsu = null;
 
 
+                var gaged_lsus_list_string = fetch('/layer_loader_frame/' + continent + '/' + sub_basin)
+                    .then(response=> response.text().then(text => {
+                        var gaged_lsus_list_string = text.split(',');
+                        // load gaged lsus
+                        var lsuLayers = []
+                        gaged_lsus_list_string.forEach(element => {
+                            console.log(element);
+
+                            lsuLayers.push(
+                                load_layer("/continents/" + continent + "/gaged-lsus/" + sub_basin + "/" + String(element), "river", on_each_feature_ = zoom_subregion,
+                                  fill_color_ = '#2987b3', color_ = '#'+(0x1000000+Math.random()*0xffffff).toString(16).substr(1,6), fill_opacity_ = 0.3, opacity_ = 1, weight_ = 0.4)
+                            );
+                        });
+
+                        gagedLsu = L.layerGroup(lsuLayers);
+                        console.log(lsuLayers)
+
+                        layer_add(gagedLsu)
+                    }));
+
+                console.log('/layer_loader_frame/' + continent + '/' + sub_basin);
+
+                riversLayer    = load_layer("/continents/" + continent + "/basin-streams/" + sub_basin + "-streams.geojson", "river", on_each_feature_ = "None",
+                                  fill_color_ = '#2987b3', color_ = '#2987b3', fill_opacity_ = 0.9, opacity_ = 1, weight_ = 0.48); layer_add(riversLayer);
+                
+                subbasinsLayer = load_layer("/continents/" + continent + "/basin-streams/" + sub_basin + ".geojson", "river", on_each_feature_ = "None",
+                                  fill_color_ = '#a80000', color_ = '#a80000', fill_opacity_ = 0.1, opacity_ = 1, weight_ = 0.4); layer_add(subbasinsLayer);
+                
+            });
+        };
+
+        
+        function load_layer(uri_, pane_, on_each_feature_ = "None", fill_color_ = '#afb7b891', color_ = '#be8e6191', fill_opacity_ = 0.1, opacity_ = 1, weight_ = 0.4){
+            // console.log("++++++++++++++++++++++++++++")
+
+            var new_layer = null;
+            if (on_each_feature_ == "None"){
+                var new_layer = new L.GeoJSON.AJAX(uri_, {
+                    pane: pane_,
+                    style: { fillColor: color_, color: fill_color_, fillOpacity: fill_opacity_, weight: weight_, opacity: opacity_, }
+                }); 
+            } else {
+                var new_layer = new L.GeoJSON.AJAX(uri_, {
+                    pane: pane_,
+                    onEachFeature: on_each_feature_,
+                    style: { fillColor: color_, color: fill_color_, fillOpacity: fill_opacity_, weight: weight_, opacity: opacity_, }
+                }); 
+            }
+            return new_layer;
+        };
+
+        function reset_subbasins(){
+
+            layer_remove(subbasinsLayer);
+            layer_remove(gagedLsu);
+            layer_remove(lsusLayer);
+            layer_remove(hrusLayer);
+            layer_remove(riversLayer);
+
+            subbasinsLayer = null;
+            gagedLsu = null;
+            lsusLayer = null;
+            hrusLayer = null;
+            riversLayer = null;
+        };
+
+        function hide_action_panel(){
+            var action_P = document.getElementById("action-pannel");
+            
+            if (action_P.classList.contains('action-pannel'))
+                {action_P.classList.remove("action-pannel")}
+
+        }
+        
+        function show_action_panel(option){
+            var action_P = document.getElementById("action-pannel");
+            
+            if (!action_P.classList.contains('action-pannel'))
+                {action_P.classList.add("action-pannel")}
+
+        }
+
+    </script>
 
 {% endblock %}

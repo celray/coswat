@@ -1,0 +1,274 @@
+{% extends 'main-header.html' %}
+
+{% block content %}
+
+        <!DOCTYPE html>
+        <html lang="en" id="all_html">
+        <head>
+            <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title></title>
+            <style>
+                #all_html,
+                #all_body,
+                #viewDiv {
+                padding: 0;
+                margin: 0;
+                height: 100%;
+                width: 100%;
+                background: radial-gradient(#12bff2,#0269a1);
+                filter: saturate(1.3) drop-shadow(0 0 20px white);
+                }
+
+                
+                
+            </style>
+
+            <!-- https://www.esri.com/arcgis-blog/products/js-api-arcgis/3d-gis/interactive-3d-globe/ -->
+            
+            <link rel="stylesheet" href="https://js.arcgis.com/4.22/esri/themes/light/main.css">
+            
+            <script>
+                const locationPath = location.pathname.replace(/\/[^\/]+$/, "");
+                dojoConfig = {
+                    packages: [{
+                        name: "utils",
+                        location: "/js/"
+                        }],
+                        async: true
+                    };
+                    
+                </script>   
+                <script src="https://js.arcgis.com/4.22/"></script>
+
+            <script>
+
+                require([
+                    "esri/config",
+                    "esri/Map",
+                    "esri/views/SceneView",
+                    "esri/layers/TileLayer",
+                    "esri/layers/GeoJSONLayer",
+                    "esri/layers/ElevationLayer",
+                    "esri/layers/BaseElevationLayer",
+
+                    "esri/Graphic",
+                    "esri/geometry/Point",
+                    "esri/geometry/Mesh",
+
+                    "esri/core/watchUtils",
+
+                    "utils/ExaggeratedElevationLayer",
+                
+                    ], function (esriConfig,Map, SceneView, TileLayer, GeoJSONLayer, ElevationLayer, BaseElevationLayer, Graphic, Point, Mesh, watchUtils, ExaggeratedElevationLayer) {
+            
+                    // variables
+                    const R = 6358137; // approximate radius of the Earth in m
+                    const offset = 0; // offset from the ground used for the clouds
+                    // const offset = 300000; // offset from the ground used for the clouds
+
+
+                    esriConfig.apiKey = "AAPK4ad44d5f9a324c4bb71da581a2e87522NFLC8MO80hWZgcx6pD-u8aXme4oUZpfLK3_9KhW_9R10-3RjbXeHg3QkT2FALP6S";
+                    
+                    
+                    const map = new Map({
+                        basemap: "satellite", // Basemap layer
+                        // ground: "world-elevation" // Elevation service
+                    });
+            
+                    const view = new SceneView({
+                        container: "viewDiv",
+                        map: map,
+                        alphaCompositingEnabled: true,
+                        qualityProfile: "high",
+                        camera: {
+                            position: [65.03975781, 14.94826384, 10921223.30821],
+                            heading: 2.03,
+                            tilt: 0.13
+                        },
+                        environment: {
+                        background: {
+                            type: "color",
+                            color: [255, 252, 244, 0]
+                        },
+                        starsEnabled: false,
+                        atmosphereEnabled: false,
+                        lighting: {
+                            directShadowsEnabled: false,
+                            date: "Sun Jun 23 2019 7:30:18 GMT+0200 (Central European Summer Time)"
+                        }
+                        },
+                        constraints: {
+                        altitude: {
+                                
+                            min:  2000000,
+                            max: 25000000
+                        }
+                        },
+                        popup: {
+                        dockEnabled: true,
+                        dockOptions: {
+                            position: "bottom-right",
+                            breakpoint: false,
+                            buttonEnabled: false
+                        },
+                        collapseEnabled: false
+                        },
+                        highlightOptions: {
+                        color: [255, 255, 255],
+                        haloOpacity: 0.5
+                        }
+                    });
+
+                    view.ui.remove("navigation-toggle");
+
+                    map.ground.layers = [new ExaggeratedElevationLayer({
+                        exaggerationBathymetry: 40,
+                        exaggerationTopography: 30
+                    })];
+
+                    const origin = new Point({
+                        x: 0, y: -90, z: -(2 * R)
+                    });
+
+                    const oceanSurfaceMesh = Mesh.createSphere(
+                        origin, {
+                        size: {
+                        width: 2 * R,
+                        depth: 2 * R,
+                        height: 2 * R
+                        },
+                        densificationFactor: 5,
+                        material: {
+                        color: [0, 210, 210, 0.8],
+                        metallic: 0.9,
+                        roughness: 0.8,
+                        doubleSided: false
+                        }
+                    });
+
+                    const oceanSurface = new Graphic({
+                        geometry: oceanSurfaceMesh,
+                        symbol: {
+                        type: "mesh-3d",
+                        symbolLayers: [{
+                            type: "fill"
+                        }]
+                        }
+                    });
+
+                    view.graphics.add(oceanSurface);
+
+                    const cloudsSphere = Mesh.createSphere(new Point({
+                        x: 0, y: -90, z: -(2 * R + offset)
+                    }), {
+                        size: 2 * (R + offset),
+                        material: {
+                            colorTexture: '/images/clouds-nasa.png',
+                            doubleSided: false
+                        },
+                        densificationFactor: 4
+                    });
+
+                    cloudsSphere.components[0].shading = "flat";
+
+                    const clouds = new Graphic({
+                        geometry: cloudsSphere,
+                        symbol: {
+                            type: "mesh-3d",
+                            symbolLayers: [{ type: "fill" }]
+                        }
+                    });
+
+                    view.graphics.add(clouds);
+
+
+                    
+                    
+                    const stations = new GeoJSONLayer({
+                        url: "/continents/stations.geojson",
+                        elevationInfo: {
+                            mode: "absolute-height",
+                            offset: offset - 100
+                        },
+                        copyright: "Data from <a href=\"https://en.wikipedia.org/wiki/Extreme_points_of_Earth\" target=\"_blank\">Extreme points on Earth</a> Wikipedia article | <a href=\"https://visibleearth.nasa.gov/view.php?id=57747\" target=\"_blank\">Cloud image</a> from NASA Goddard Space Flight Center (image by Reto Stöckli) for the cloud layer",
+                        renderer: {
+                        type: "simple",
+                        symbol: {
+                            type: "point-3d",
+                            
+                            symbolLayers: [
+                                {
+                                    type: "icon",
+                                    resource: { primitive: "circle" },
+                                    material: { color: [0, 0, 0, 0] },
+                                    size: 4,
+                                    outline: { color: [0, 115, 204, 1], size: 5 },
+                                },
+                                // {
+                                //     type: "icon",
+                                //     resource: { primitive: "circle" },
+                                //     material: { color: [0, 0, 0, 0] },
+                                //     outline: { color: [245, 99, 66, 1], size: 2 },
+                                //     size: 30
+                                // }
+                            ]
+                        }
+                        },
+                        popupTemplate: {
+                        title: "{name}",
+                        content: `
+                            <div style='width: 400px; height: 342px; border-radius: 7px; overflow: hidden;'>
+
+                                <div class="point-title" style="padding: 5px;">GRDC Station: {grdc_no}</div>
+
+                                <div class="point-title" style="padding: 5px;">Evaluation (Month)</div>
+
+                                <div style="display: flex; width: 100%; margin-left: 15px;">
+                                    <div style="width: 59px;">NSE</div>
+                                    <div>: {nse}</div>
+                                </div>
+
+                                <div style="display: flex; width: 100%; margin-left: 15px;">
+                                    <div style="width: 59px;">PBIAS</div>
+                                    <div>: {pbias}</div>
+                                </div>
+
+                                <a href="/graph/{graph_field}" style="overflow: hidden; width: 400px;">
+                                    <div class="chart" style="background-color: white; background-image: url(/graph/{graph_field}); margin-left: -20px; width: 500px; height: 200px; background-position: center; background-repeat: no-repeat; background-size: contain;">
+                                    </div>
+                                </a>
+                                
+                            </div>
+                        `
+                        }
+                    });
+
+                    map.layers.add(stations);
+
+                    watchUtils.whenFalseOnce(view, "updating", rotate);
+
+                        function rotate() {
+                            if (!view.interacting) {
+                                const camera = view.camera.clone();
+                                camera.position.longitude -= 0.2;
+                                view.goTo(camera, { animate: false });
+                                requestAnimationFrame(rotate);
+                            }
+                        }
+                    });
+                </script>
+            </head>
+            
+            <body id="all_body" style="height: calc(100vh - 0px); overflow: hidden;">
+                <div id="viewDiv" style="height: calc(100vh + 20px);"></div>
+            </body>
+
+           
+            
+        </html>
+
+
+
+{% endblock %}
