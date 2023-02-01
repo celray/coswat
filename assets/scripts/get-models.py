@@ -35,6 +35,8 @@ dissolve = True if ((args[1] == 'yes') or (args[1] == 'y')) else False
 all_zones = {}
 final_json = None
 
+master_lsus = None
+
 for model_setup in zones:
     parts       = model_setup.split('-')
 
@@ -64,7 +66,14 @@ for model_setup in zones:
     lsus2 = lsus2[['geometry', 'name']].dissolve()
     rivs1 = rivs1[['geometry', 'name']]
 
+    if master_lsus is None:
+        master_lsus = lsus2
+    else:
+        master_lsus = geopandas.GeoDataFrame(pandas.concat([master_lsus, lsus2]), geometry='geometry', crs = lsus2.crs)
+
     gaged_shapes_dir = create_path(f'../model-data/{continent}/major-basins/major-basins/{basin}/')
+       
+    
     lsus2.to_file(f'../model-data/{continent}/major-basins/major-basins/{basin}.geojson', driver="GeoJSON")
     rivs1.to_file(f'../model-data/{continent}/major-basins/major-basins/{basin}-streams.geojson', driver="GeoJSON")
 
@@ -194,7 +203,8 @@ for model_setup in zones:
     break_loop = False
     
     while not break_loop:
-
+        if len(sorted_selected_rivers) == 1:
+            break
         all_good = False
         for riv_idx in range(0, len(sorted_selected_rivers) - 1):
             if len(upstream_rivers[sorted_selected_rivers[riv_idx]]) < len(upstream_rivers[sorted_selected_rivers[riv_idx + 1]]):
@@ -287,3 +297,7 @@ for continent in all_zones:
 if not final_json is None:
     print(f"\t# preparing global performance for flow shapefile")
     final_json.to_file(f'../model-data/global/stations.geojson', driver = 'GeoJSON')
+
+if not master_lsus is None:
+    print(f"\t# preparing global lsus shapefile")
+    master_lsus.to_file(f'../model-data/global/lsus.geojson', driver = 'GeoJSON')
